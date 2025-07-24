@@ -1,0 +1,277 @@
+# Site Template for Multi-Site Deployment
+# Replace {{SITE_NAME}}, {{SITE_DOMAIN}}, {{SITE_NAMESPACE}} with actual values
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{SITE_NAMESPACE}}
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}}
+    environment: production
+    managed-by: terraform
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{SITE_NAME}}-quota
+  namespace: {{SITE_NAMESPACE}}
+spec:
+  hard:
+    requests.cpu: "2"
+    requests.memory: 4Gi
+    limits.cpu: "4"
+    limits.memory: 8Gi
+    persistentvolumeclaims: "5"
+    services: "10"
+    services.loadbalancers: "1"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{SITE_NAME}}-config
+  namespace: {{SITE_NAMESPACE}}
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}}
+data:
+  SITE_NAME: "{{SITE_NAME}}"
+  SITE_DOMAIN: "{{SITE_DOMAIN}}"
+  NODE_ENV: "production"
+  DATABASE_URL: "postgresql://{{SITE_NAME}}_user:{{SITE_NAME}}_pass@{{SITE_NAME}}-db:5432/{{SITE_NAME}}_db"
+  REDIS_URL: "redis://{{SITE_NAME}}-redis:6379"
+  UPLOAD_DIR: "/app/uploads"
+  MAX_FILE_SIZE: "10MB"
+  SESSION_SECRET: "{{SITE_NAME}}_session_secret"
+  JWT_SECRET: "{{SITE_NAME}}_jwt_secret"
+  NEXT_PUBLIC_SITE_URL: "https://{{SITE_DOMAIN}}"
+  NEXT_PUBLIC_API_URL: "https://{{SITE_DOMAIN}}/api"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{SITE_NAME}}-secrets
+  namespace: {{SITE_NAMESPACE}}
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}}
+type: Opaque
+data:
+  DATABASE_PASSWORD: "{{SITE_NAME}}_db_password_base64"
+  REDIS_PASSWORD: "{{SITE_NAME}}_redis_password_base64"
+  SESSION_SECRET: "{{SITE_NAME}}_session_secret_base64"
+  JWT_SECRET: "{{SITE_NAME}}_jwt_secret_base64"
+  OPENAI_API_KEY: "{{OPENAI_API_KEY_BASE64}}"
+  GOOGLE_API_KEY: "{{GOOGLE_API_KEY_BASE64}}"
+  STRIPE_SECRET_KEY: "{{STRIPE_SECRET_KEY_BASE64}}"
+  STRIPE_WEBHOOK_SECRET: "{{STRIPE_WEBHOOK_SECRET_BASE64}}"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{SITE_NAME}}-app
+  namespace: {{SITE_NAMESPACE}}
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}}
+    component: app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: master-cms
+      site: {{SITE_NAME}}
+      component: app
+  template:
+    metadata:
+      labels:
+        app: master-cms
+        site: {{SITE_NAME}}
+        component: app
+    spec:
+      serviceAccountName: {{SITE_NAME}}-sa
+      containers:
+      - name: app
+        image: master-cms:latest
+        ports:
+        - containerPort: 3000
+          name: http
+        envFrom:
+        - configMapRef:
+            name: {{SITE_NAME}}-config
+        - secretRef:
+            name: {{SITE_NAME}}-secrets
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        resources:
+          limits:
+            cpu: "1"
+            memory: 2Gi
+          requests:
+            cpu: "500m"
+            memory: 1Gi
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+        - name: tmp
+          mountPath: /tmp
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: {{SITE_NAME}}-uploads-pvc
+      - name: tmp
+        emptyDir: {}
+      imagePullSecrets:
+      - name: {{SITE_NAME}}-registry-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{SITE_NAME}}-app
+  namespace: {{SITE_NAMESPACE}}
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}}
+    component: app
+spec:
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  selector:
+    app: master-cms
+    site: {{SITE_NAME}}
+    component: app
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{SITE_NAME}}-uploads-pvc
+  namespace: {{SITE_NAMESPACE}}
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: gp2
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{SITE_NAME}}-ingress
+  namespace: {{SITE_NAMESPACE}}
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}}
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+spec:
+  tls:
+  - hosts:
+    - {{SITE_DOMAIN}}
+    secretName: {{SITE_NAME}}-tls
+  rules:
+  - host: {{SITE_DOMAIN}}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{SITE_NAME}}-app
+            port:
+              number: 80
+---
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: {{SITE_NAME}}-cert
+  namespace: {{SITE_NAMESPACE}}
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}}
+spec:
+  secretName: {{SITE_NAME}}-tls
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  dnsNames:
+  - {{SITE_DOMAIN}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  namespace: {{SITE_NAMESPACE}}
+  name: {{SITE_NAME}}-role
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}}
+rules:
+- apiGroups: [""]
+  resources: ["pods", "services", "configmaps", "secrets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "replicasets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{SITE_NAME}}-rolebinding
+  namespace: {{SITE_NAMESPACE}}
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}}
+subjects:
+- kind: ServiceAccount
+  name: {{SITE_NAME}}-sa
+  namespace: {{SITE_NAMESPACE}}
+roleRef:
+  kind: Role
+  name: {{SITE_NAME}}-role
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{SITE_NAME}}-sa
+  namespace: {{SITE_NAMESPACE}}
+  labels:
+    app: master-cms
+    site: {{SITE_NAME}} 

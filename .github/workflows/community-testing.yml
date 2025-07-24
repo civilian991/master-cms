@@ -1,0 +1,698 @@
+name: Community System Testing Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - '__tests__/**'
+      - 'prisma/**'
+      - 'package*.json'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'src/**'
+      - '__tests__/**'
+      - 'prisma/**'
+      - 'package*.json'
+  schedule:
+    # Run nightly tests
+    - cron: '0 2 * * *'
+
+env:
+  NODE_VERSION: '18'
+  DATABASE_URL: 'postgresql://test:test@localhost:5432/testdb'
+  NEXTAUTH_SECRET: 'test-secret-for-ci'
+  NEXTAUTH_URL: 'http://localhost:3000'
+
+jobs:
+  # Setup and validation
+  setup:
+    name: Setup and Validation
+    runs-on: ubuntu-latest
+    outputs:
+      node-version: ${{ steps.setup.outputs.node-version }}
+      cache-key: ${{ steps.setup.outputs.cache-key }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        id: setup
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Cache dependencies
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            .next/cache
+          key: ${{ runner.os }}-node-${{ env.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-${{ env.NODE_VERSION }}-
+
+      - name: Install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Validate package.json
+        run: npm run lint:package
+
+      - name: Check TypeScript compilation
+        run: npm run type-check
+
+  # Linting and code quality
+  lint:
+    name: Linting and Code Quality
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Prettier check
+        run: npm run format:check
+
+      - name: Run TypeScript check
+        run: npm run type-check
+
+      - name: Check for circular dependencies
+        run: npx madge --circular --extensions ts,tsx src/
+
+      - name: Analyze bundle size
+        run: npm run analyze
+
+  # Unit tests
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    strategy:
+      matrix:
+        test-group: [
+          'components',
+          'services',
+          'utilities',
+          'hooks',
+          'mobile'
+        ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests for ${{ matrix.test-group }}
+        run: npm run test:unit -- --testPathPattern=${{ matrix.test-group }} --coverage --coverageDirectory=coverage/${{ matrix.test-group }}
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./coverage/${{ matrix.test-group }}
+          flags: unit-tests-${{ matrix.test-group }}
+          name: unit-tests-${{ matrix.test-group }}
+
+  # Integration tests
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup database
+        run: |
+          npx prisma db push
+          npx prisma db seed
+
+      - name: Run integration tests
+        run: npm run test:integration -- --coverage --coverageDirectory=coverage/integration
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          directory: ./coverage/integration
+          flags: integration-tests
+          name: integration-tests
+
+  # End-to-end tests
+  e2e-tests:
+    name: End-to-End Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Setup database
+        run: |
+          npx prisma db push
+          npx prisma db seed
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start application
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for application
+        run: npx wait-on http://localhost:3000
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: e2e-test-results
+          path: |
+            test-results/
+            playwright-report/
+
+  # Security testing
+  security-tests:
+    name: Security Testing
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: npm audit --audit-level=moderate
+
+      - name: Run dependency vulnerability scan
+        run: npx audit-ci --moderate
+
+      - name: Run security tests
+        run: npm run test:security
+
+      - name: Run SAST scan with Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/owasp-top-ten
+            p/javascript
+            p/typescript
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+
+  # Performance testing
+  performance-tests:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+    needs: setup
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup database
+        run: |
+          npx prisma db push
+          npx prisma db seed
+
+      - name: Run performance tests
+        run: npm run test:performance
+
+      - name: Build application for performance testing
+        run: npm run build
+
+      - name: Start application
+        run: npm start &
+        env:
+          PORT: 3000
+
+      - name: Wait for application
+        run: npx wait-on http://localhost:3000
+
+      - name: Run Lighthouse CI
+        run: |
+          npm install -g @lhci/cli
+          lhci autorun
+
+      - name: Upload Lighthouse results
+        uses: actions/upload-artifact@v3
+        with:
+          name: lighthouse-results
+          path: .lighthouseci/
+
+  # Database migration testing
+  migration-tests:
+    name: Database Migration Testing
+    runs-on: ubuntu-latest
+    needs: setup
+    strategy:
+      matrix:
+        postgres-version: ['13', '14', '15']
+    services:
+      postgres:
+        image: postgres:${{ matrix.postgres-version }}
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: testdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test database migrations
+        run: |
+          # Test fresh migration
+          npx prisma db push
+          
+          # Test migration rollback and reapply
+          npx prisma migrate reset --force
+          npx prisma db push
+          
+          # Test data seeding
+          npx prisma db seed
+          
+          # Verify schema integrity
+          npx prisma validate
+
+      - name: Run migration tests
+        run: npm run test:migration
+
+  # Browser compatibility testing
+  browser-tests:
+    name: Browser Compatibility
+    runs-on: ubuntu-latest
+    needs: setup
+    strategy:
+      matrix:
+        browser: ['chromium', 'firefox', 'webkit']
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install ${{ matrix.browser }}
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start application
+        run: npm start &
+
+      - name: Wait for application
+        run: npx wait-on http://localhost:3000
+
+      - name: Run browser tests on ${{ matrix.browser }}
+        run: npx playwright test --project=${{ matrix.browser }}
+
+  # Accessibility testing
+  accessibility-tests:
+    name: Accessibility Testing
+    runs-on: ubuntu-latest
+    needs: setup
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Restore dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.npm
+            node_modules
+          key: ${{ needs.setup.outputs.cache-key }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build application
+        run: npm run build
+
+      - name: Start application
+        run: npm start &
+
+      - name: Wait for application
+        run: npx wait-on http://localhost:3000
+
+      - name: Run accessibility tests
+        run: npm run test:a11y
+
+      - name: Upload accessibility results
+        uses: actions/upload-artifact@v3
+        with:
+          name: accessibility-results
+          path: accessibility-report/
+
+  # Code quality and coverage reporting
+  coverage-report:
+    name: Coverage Report
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download coverage reports
+        uses: actions/download-artifact@v3
+
+      - name: Combine coverage reports
+        run: |
+          npm install -g nyc
+          nyc merge coverage/*/coverage-final.json coverage/merged-coverage.json
+          nyc report --reporter=lcov --reporter=text --reporter=html
+
+      - name: Upload combined coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: combined
+          name: combined-coverage
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: romeovs/lcov-reporter-action@v0.3.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          lcov-file: ./coverage/lcov.info
+
+  # Deployment readiness check
+  deployment-check:
+    name: Deployment Readiness
+    runs-on: ubuntu-latest
+    needs: [
+      lint,
+      unit-tests,
+      integration-tests,
+      e2e-tests,
+      security-tests,
+      performance-tests,
+      migration-tests
+    ]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build production bundle
+        run: npm run build
+
+      - name: Verify build artifacts
+        run: |
+          test -d .next
+          test -f .next/BUILD_ID
+          ls -la .next/static/
+
+      - name: Run deployment tests
+        run: npm run test:deployment
+
+      - name: Generate deployment report
+        run: |
+          echo "# Deployment Report" > deployment-report.md
+          echo "## Build Information" >> deployment-report.md
+          echo "- Build ID: $(cat .next/BUILD_ID)" >> deployment-report.md
+          echo "- Node Version: $NODE_VERSION" >> deployment-report.md
+          echo "- Build Time: $(date)" >> deployment-report.md
+          echo "## Test Results" >> deployment-report.md
+          echo "✅ All tests passed" >> deployment-report.md
+
+      - name: Upload deployment artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-artifacts
+          path: |
+            .next/
+            deployment-report.md
+
+  # Notification on failure
+  notify-on-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [
+      lint,
+      unit-tests,
+      integration-tests,
+      e2e-tests,
+      security-tests,
+      performance-tests
+    ]
+    if: failure()
+    steps:
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: "❌ Community System tests failed on ${{ github.ref }}"
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Create GitHub issue on failure
+        if: github.ref == 'refs/heads/main'
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: 'CI/CD Pipeline Failure',
+              body: `
+                ## Pipeline Failure Report
+                
+                **Branch:** ${context.ref}
+                **Commit:** ${context.sha}
+                **Workflow:** ${context.workflow}
+                **Run ID:** ${context.runId}
+                
+                The automated testing pipeline has failed. Please investigate and fix the issues.
+                
+                [View workflow run](${context.payload.repository.html_url}/actions/runs/${context.runId})
+              `,
+              labels: ['bug', 'ci/cd', 'high-priority']
+            }); 

@@ -1,0 +1,405 @@
+@import '@fontsource-variable/inter';
+@import 'tailwindcss';
+
+:root {
+  /* Rich, sophisticated light theme like Tweakn */
+  --background: rgb(250, 250, 250);        /* Warmer, richer background */
+  --foreground: rgb(20, 20, 20);           /* Deeper black text */
+  --card: rgb(255, 255, 255);              /* Pure white cards for contrast */
+  --card-foreground: rgb(20, 20, 20);      /* Deep text on cards */
+  --popover: rgb(255, 255, 255);
+  --popover-foreground: rgb(20, 20, 20);
+  --primary: rgb(245, 158, 11);            /* Beautiful amber primary */
+  --primary-foreground: rgb(0, 0, 0);
+  --secondary: rgb(240, 240, 240);         /* Sophisticated gray */
+  --secondary-foreground: rgb(60, 60, 60);
+  --muted: rgb(245, 245, 245);             /* Subtle muted backgrounds */
+  --muted-foreground: rgb(100, 100, 100);
+  --accent: rgb(255, 248, 220);            /* Warm amber accent */
+  --accent-foreground: rgb(146, 64, 14);
+  --destructive: rgb(239, 68, 68);
+  --destructive-foreground: rgb(255, 255, 255);
+  --border: rgb(220, 220, 220);            /* Softer, more visible borders */
+  --input: rgb(248, 248, 248);             /* Subtle input backgrounds */
+  --ring: rgb(245, 158, 11);
+  --chart-1: rgb(245, 158, 11);
+  --chart-2: rgb(217, 119, 6);
+  --chart-3: rgb(180, 83, 9);
+  --chart-4: rgb(146, 64, 14);
+  --chart-5: rgb(120, 53, 15);
+  --sidebar: rgb(248, 248, 248);           /* Sophisticated sidebar */
+  --sidebar-foreground: rgb(20, 20, 20);
+  --sidebar-primary: rgb(245, 158, 11);
+  --sidebar-primary-foreground: rgb(255, 255, 255);
+  --sidebar-accent: rgb(255, 248, 220);
+  --sidebar-accent-foreground: rgb(146, 64, 14);
+  --sidebar-border: rgb(220, 220, 220);
+  --sidebar-ring: rgb(245, 158, 11);
+  --font-sans: Inter, sans-serif;
+  --font-serif: Source Serif 4, serif;
+  --font-mono: JetBrains Mono, monospace;
+  --radius: 0.5rem;                        /* Slightly more rounded like Tweakn */
+  
+  /* Enhanced shadows for depth like Tweakn */
+  --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.05);
+  --shadow-xs: 0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+  --shadow-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 1px 2px 0px rgba(0, 0, 0, 0.06);
+  --shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.1), 0px 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0px 20px 25px -5px rgba(0, 0, 0, 0.1), 0px 10px 10px -5px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-2xl: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+
+  /* Radius calculations */
+  --radius-sm: calc(0.5rem - 4px);
+  --radius-md: calc(0.5rem - 2px);
+  --radius-lg: 0.5rem;
+  --radius-xl: calc(0.5rem + 4px);
+}
+
+.dark {
+  /* Rich, deep dark theme like Tweakn */
+  --background: rgb(16, 16, 16);           /* Deeper, richer black */
+  --foreground: rgb(250, 250, 250);       /* Brighter white text */
+  --card: rgb(28, 28, 28);                /* Rich dark cards */
+  --card-foreground: rgb(250, 250, 250);
+  --popover: rgb(28, 28, 28);
+  --popover-foreground: rgb(250, 250, 250);
+  --primary: rgb(245, 158, 11);           /* Beautiful amber */
+  --primary-foreground: rgb(0, 0, 0);
+  --secondary: rgb(32, 32, 32);           /* Sophisticated dark gray */
+  --secondary-foreground: rgb(250, 250, 250);
+  --muted: rgb(24, 24, 24);               /* Subtle dark backgrounds */
+  --muted-foreground: rgb(160, 160, 160);
+  --accent: rgb(67, 28, 7);               /* Rich dark amber */
+  --accent-foreground: rgb(254, 215, 170);
+  --destructive: rgb(239, 68, 68);
+  --destructive-foreground: rgb(255, 255, 255);
+  --border: rgb(48, 48, 48);              /* Visible but subtle borders */
+  --input: rgb(32, 32, 32);               /* Rich input backgrounds */
+  --ring: rgb(245, 158, 11);
+  --chart-1: rgb(251, 191, 36);
+  --chart-2: rgb(217, 119, 6);
+  --chart-3: rgb(146, 64, 14);
+  --chart-4: rgb(180, 83, 9);
+  --chart-5: rgb(146, 64, 14);
+  --sidebar: rgb(12, 12, 12);             /* Even deeper sidebar */
+  --sidebar-foreground: rgb(250, 250, 250);
+  --sidebar-primary: rgb(245, 158, 11);
+  --sidebar-primary-foreground: rgb(0, 0, 0);
+  --sidebar-accent: rgb(67, 28, 7);
+  --sidebar-accent-foreground: rgb(254, 215, 170);
+  --sidebar-border: rgb(48, 48, 48);
+  --sidebar-ring: rgb(245, 158, 11);
+  --font-sans: Inter, sans-serif;
+  --font-serif: Source Serif 4, serif;
+  --font-mono: JetBrains Mono, monospace;
+  --radius: 0.5rem;
+  
+  /* Enhanced shadows for dark mode */
+  --shadow-2xs: 0px 1px 2px 0px rgba(0, 0, 0, 0.3);
+  --shadow-xs: 0px 1px 3px 0px rgba(0, 0, 0, 0.4), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0px 1px 3px 0px rgba(0, 0, 0, 0.4), 0px 1px 2px 0px rgba(0, 0, 0, 0.2);
+  --shadow: 0px 4px 6px -1px rgba(0, 0, 0, 0.4), 0px 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0px 10px 15px -3px rgba(0, 0, 0, 0.4), 0px 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0px 20px 25px -5px rgba(0, 0, 0, 0.4), 0px 10px 10px -5px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0px 25px 50px -12px rgba(0, 0, 0, 0.6);
+  --shadow-2xl: 0px 25px 50px -12px rgba(0, 0, 0, 0.6);
+}
+
+/* Base Styles - Matching Tweakn */
+* {
+  border-color: var(--border);
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+  font-variant-ligatures: common-ligatures;
+}
+
+/* Typography - Professional weights */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+  line-height: 1.25;
+  margin: 0;
+}
+
+h1 { font-size: 1.875rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+h4 { font-size: 1.125rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
+
+@media (min-width: 1024px) {
+  h1 { font-size: 2.25rem; }
+  h2 { font-size: 1.875rem; }
+  h3 { font-size: 1.5rem; }
+  h4 { font-size: 1.25rem; }
+  h5 { font-size: 1.125rem; }
+  h6 { font-size: 1rem; }
+}
+
+p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* Focus Management */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--radius);
+}
+
+/* Professional Card Styles - Enhanced for Tweakn look */
+.card {
+  background: var(--card);
+  color: var(--card-foreground);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-md);           /* Stronger shadows like Tweakn */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+  border-color: var(--primary);
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary), var(--accent-foreground));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* Button Styles */
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: all 0.2s ease-out;
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: var(--secondary-foreground);
+  border: 1px solid var(--border);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+/* Input Styles */
+.input {
+  background: var(--background);
+  border: 1px solid var(--input);
+  color: var(--foreground);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  transition: all 0.2s ease-out;
+  font: inherit;
+}
+
+.input:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+/* Link Styles */
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color 0.2s ease-out;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  background: var(--sidebar);
+  color: var(--sidebar-foreground);
+  border-right: 1px solid var(--sidebar-border);
+}
+
+.sidebar-nav-item {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  transition: all 0.2s ease-out;
+  cursor: pointer;
+}
+
+.sidebar-nav-item:hover {
+  background: var(--sidebar-accent);
+  color: var(--sidebar-accent-foreground);
+}
+
+.sidebar-nav-item.active {
+  background: var(--sidebar-primary);
+  color: var(--sidebar-primary-foreground);
+}
+
+/* Utility Classes */
+.text-muted {
+  color: var(--muted-foreground);
+}
+
+.text-accent {
+  color: var(--accent-foreground);
+}
+
+.border-radius-sm { border-radius: var(--radius-sm); }
+.border-radius-md { border-radius: var(--radius-md); }
+.border-radius-lg { border-radius: var(--radius-lg); }
+.border-radius-xl { border-radius: var(--radius-xl); }
+
+.shadow-2xs { box-shadow: var(--shadow-2xs); }
+.shadow-xs { box-shadow: var(--shadow-xs); }
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow { box-shadow: var(--shadow); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-xl { box-shadow: var(--shadow-xl); }
+.shadow-2xl { box-shadow: var(--shadow-2xl); }
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+  transition: background-color 0.2s ease-out;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Enhanced Button and Form States */
+button, [role="button"] {
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  border: none;
+  font: inherit;
+}
+
+button:disabled, [role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+
+input:disabled, select:disabled, textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-in-down {
+  animation: slideInDown 0.3s ease-out;
+}
+
+/* Print Styles */
+@media print {
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  
+  a, a:visited {
+    text-decoration: underline;
+    color: black !important;
+  }
+}

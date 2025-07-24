@@ -1,0 +1,5311 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Master Framework Foundation Models
+
+model Site {
+  id          String   @id @default(cuid())
+  name        String
+  domain      String   @unique
+  description String?
+  locale      String   @default("en")
+  theme       String   @default("default")
+  branding    String   @default("default")
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  users       User[]
+  articles    Article[]
+  categories  Category[]
+  tags        Tag[]
+  media       Media[]
+  newsletters Newsletter[]
+  settings    SiteSetting[]
+  contentTemplates ContentTemplate[]
+  contentWorkflows ContentWorkflow[]
+  
+  // Enhanced Multi-Site Relations
+  configuration SiteConfiguration?
+  siteBranding  SiteBranding?
+  permissions   SitePermission[]
+  subscriptions Subscription[]
+  payments      Payment[]
+  advertisements Advertisement[]
+  adCampaigns    AdCampaign[]
+  adPlacements   AdPlacement[]
+  adPerformances AdPerformance[]
+  adNetworks     AdNetwork[]
+  adBlocking     AdBlocking[]
+  adOptimizations AdOptimization[]
+  analytics     Analytics[]
+  revenueAnalytics RevenueAnalytics[]
+  userAnalytics UserAnalytics[]
+  contentAnalytics ContentAnalytics[]
+  siteAnalytics SiteAnalytics[]
+  aiConfiguration AIConfiguration?
+  contentGenerations ContentGeneration[]
+  automationWorkflows AutomationWorkflow[]
+  contentOptimizations ContentOptimization[]
+  
+  // Predictive Analytics & Personalization Relations
+  userBehaviorEvents UserBehaviorEvent[]
+  userProfiles UserProfile[]
+  mlModels MLModel[]
+  userPredictions UserPrediction[]
+  contentRecommendations ContentRecommendation[]
+  abTests ABTest[]
+  abTestAssignments ABTestAssignment[]
+  personalizationRules PersonalizationRule[]
+  analyticsDashboards AnalyticsDashboard[]
+  
+  // Content Optimization Relations
+  seoOptimizations SEOOptimization[]
+  imageOptimizations ImageOptimization[]
+  performanceMetrics PerformanceMetrics[]
+  accessibilityAudits AccessibilityAudit[]
+  contentQualityAnalyses ContentQualityAnalysis[]
+  optimizationTriggers OptimizationTrigger[]
+  performanceBudgets PerformanceBudget[]
+  
+  // Advanced AI Relations
+  advancedPersonality AdvancedPersonality?
+  advancedContentGeneration AdvancedContentGeneration?
+  contentGenerationSessions ContentGenerationSession[]
+  contentSchedules ContentSchedule[]
+  
+  // Data & Analytics Relations
+  dataWarehouses DataWarehouse[]
+  dataSources DataSource[]
+  analyticsEngines AnalyticsEngine[]
+  competitiveIntelligence CompetitiveIntelligence[]
+  marketData MarketData[]
+  businessMetrics BusinessMetric[]
+  businessAlerts BusinessAlert[]
+  predictiveInsights PredictiveInsight[]
+  
+  // CRM Relations
+  leads       Lead[]
+  contacts    Contact[]
+  deals       Deal[]
+  interactions Interaction[]
+  campaigns   Campaign[]
+  campaignLeads CampaignLead[]
+  campaignContacts CampaignContact[]
+  tasks       Task[]
+  workflows   Workflow[]
+  workflowExecutions WorkflowExecution[]
+  
+  // Community Relations
+  forums      Forum[]
+  forumCategories ForumCategory[]
+  forumThreads ForumThread[]
+  forumPosts  ForumPost[]
+  forumModerators ForumModerator[]
+  comments    Comment[]
+  events      Event[]
+  eventAttendees EventAttendee[]
+  communities Community[]
+  communityMembers CommunityMember[]
+  communityModerators CommunityModerator[]
+  communityUserProfiles CommunityUserProfile[]
+  userFollows UserFollow[]
+  userActivities UserActivity[]
+  achievements Achievement[]
+  userAchievements UserAchievement[]
+  reports     Report[]
+  
+  // Marketing Relations
+  marketingCampaigns MarketingCampaign[]
+  marketingLeads MarketingLead[]
+  marketingAutomations MarketingAutomation[]
+  marketingAutomationExecutions MarketingAutomationExecution[]
+  socialMediaPosts SocialMediaPost[]
+  emailCampaigns EmailCampaign[]
+  emailCampaignRecipients EmailCampaignRecipient[]
+  marketingAnalytics MarketingAnalytics[]
+  marketingABTests MarketingABTest[]
+  marketingLeadActivities MarketingLeadActivity[]
+  influencers Influencer[]
+  influencerCampaigns InfluencerCampaign[]
+  seoKeywords SEOKeyword[]
+  seoCompetitors SEOCompetitor[]
+
+  // Security Relations
+  securityEvents      SecurityEvent[]
+  complianceRecords   ComplianceRecord[]
+  vulnerabilityScans  VulnerabilityScan[]
+  vulnerabilities     Vulnerability[]
+  securityPolicies    SecurityPolicy[]
+  policyViolations    PolicyViolation[]
+  auditLogs           AuditLog[]
+  encryptionKeys      EncryptionKey[]
+  keyUsageLogs        KeyUsageLog[]
+  securityIncidents   SecurityIncident[]
+  incidentTimelines   IncidentTimeline[]
+  userSecurityProfiles UserSecurityProfile[]
+  securitySessions    UserSecuritySession[]
+
+  @@map("sites")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(USER)
+  locale    String   @default("en")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Site relation
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // Relations
+  articles  Article[]
+  media     Media[]
+  securityEvents SecurityEvent[]
+  reviewedArticles Article[] @relation("ArticleReviewer")
+  approvedArticles Article[] @relation("ArticleApprover")
+  
+  // Enhanced Relations
+  permissions SitePermission[]
+  subscriptions Subscription[]
+  payments    Payment[]
+  analytics   UserAnalytics[]
+  
+  // Predictive Analytics & Personalization Relations
+  userBehaviorEvents UserBehaviorEvent[]
+  userProfile UserProfile?
+  userPredictions UserPrediction[]
+  contentRecommendations ContentRecommendation[]
+  abTestAssignments ABTestAssignment[]
+  
+  // CRM Relations
+  assignedLeads Lead[] @relation("LeadAssignment")
+  assignedContacts Contact[] @relation("ContactAssignment")
+  assignedDeals Deal[] @relation("DealAssignment")
+  assignedTasks Task[] @relation("TaskAssignment")
+  initiatedInteractions Interaction[] @relation("InteractionInitiated")
+  createdCampaigns Campaign[] @relation("CampaignCreated")
+  createdWorkflows Workflow[] @relation("WorkflowCreated")
+  
+  // Community Relations
+  forumThreads ForumThread[]
+  forumPosts  ForumPost[]
+  forumModerators ForumModerator[]
+  comments    Comment[]
+  events      Event[]
+  eventAttendees EventAttendee[]
+  communities Community[]
+  communityMembers CommunityMember[]
+  communityModerators CommunityModerator[]
+  communityUserProfile CommunityUserProfile?
+  userActivities UserActivity[]
+  userAchievements UserAchievement[]
+  reports     Report[]
+  reportedUser Report[] @relation("ReportedUser")
+  reportModerator Report[] @relation("ReportModerator")
+  
+  // Marketing Relations
+  marketingCampaigns MarketingCampaign[] @relation("MarketingCampaignCreated")
+  marketingAutomations MarketingAutomation[] @relation("MarketingAutomationCreated")
+  socialMediaPosts SocialMediaPost[] @relation("SocialMediaPostCreated")
+  emailCampaigns EmailCampaign[] @relation("EmailCampaignCreated")
+  marketingABTests MarketingABTest[] @relation("MarketingABTestCreated")
+  influencerCampaigns InfluencerCampaign[] @relation("InfluencerCampaignCreated")
+  
+  // Content Collaboration Relations
+  contentCollaborations ContentCollaboration[]
+
+  // Security Relations
+  securityEventResponses SecurityEvent[]              @relation("SecurityEventResponse")
+  complianceRecords      ComplianceRecord[]
+  complianceAssessments  ComplianceRecord[]           @relation("ComplianceAssessor")
+  complianceRemediations ComplianceRecord[]           @relation("ComplianceRemediator")
+  scheduledScans         VulnerabilityScan[]          @relation("ScanScheduler")
+  reviewedScans          VulnerabilityScan[]          @relation("ScanReviewer")
+  assignedVulns          Vulnerability[]              @relation("VulnerabilityAssignee")
+  ownedPolicies          SecurityPolicy[]             @relation("PolicyOwner")
+  approvedPolicies       SecurityPolicy[]             @relation("PolicyApprover")
+  reviewedPolicies       SecurityPolicy[]             @relation("PolicyReviewer")
+  violationDetections    PolicyViolation[]            @relation("ViolationDetector")
+  violationResolutions   PolicyViolation[]            @relation("ViolationResolver")
+  policyViolations       PolicyViolation[]
+  auditLogs              AuditLog[]
+  keyUsageLogs           KeyUsageLog[]
+  assignedIncidents      SecurityIncident[]           @relation("IncidentAssignee")
+  reportedIncidents      SecurityIncident[]           @relation("IncidentReporter")
+  incidentTimelines      IncidentTimeline[]
+  securityProfile        UserSecurityProfile?
+
+  @@map("users")
+}
+
+// Enhanced Article model with workflow and versioning
+model Article {
+  id               String         @id @default(cuid())
+  titleEn          String?
+  titleAr          String?
+  contentEn        String?        @db.Text
+  contentAr        String?        @db.Text
+  slug             String         @unique
+  excerptEn        String?
+  excerptAr        String?
+  
+  // Author and relationships
+  authorId         String
+  author           User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  categoryId       String?
+  category         Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  tags             ArticleTag[]
+  media            Media[]
+  comments         Comment[]
+  
+  // Workflow fields
+  status           ArticleStatus  @default(DRAFT)
+  workflowState    WorkflowState  @default(DRAFT)
+  reviewedBy       String?
+  reviewer         User?          @relation("ArticleReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  reviewedAt       DateTime?
+  approvedBy       String?
+  approver         User?          @relation("ArticleApprover", fields: [approvedBy], references: [id], onDelete: SetNull)
+  approvedAt       DateTime?
+  
+  // Publishing fields
+  published        Boolean        @default(false)
+  publishedAt      DateTime?
+  scheduledAt      DateTime?
+  expiresAt        DateTime?
+  
+  // Versioning fields
+  version          Int            @default(1)
+  parentVersionId  String?
+  parentVersion    Article?       @relation("ArticleVersions", fields: [parentVersionId], references: [id], onDelete: SetNull)
+  versions         Article[]      @relation("ArticleVersions")
+  
+  // Template fields
+  templateId       String?
+  template         ContentTemplate? @relation(fields: [templateId], references: [id], onDelete: SetNull)
+  
+  // Analytics fields
+  viewCount        Int            @default(0)
+  engagementScore  Float          @default(0)
+  readTime         Int?           // Estimated reading time in minutes
+  
+  // Analytics relations
+  contentAnalytics ContentAnalytics[]
+  contentSearchIndex ContentSearchIndex?
+  contentOptimizations ContentOptimization[]
+  
+  // SEO fields
+  seoTitleEn       String?
+  seoTitleAr       String?
+  seoDescriptionEn String?
+  seoDescriptionAr String?
+  seoKeywordsEn    String?
+  seoKeywordsAr    String?
+  canonicalUrl     String?
+  
+  // Site-specific fields
+  siteId           String
+  site             Site           @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+
+  @@map("articles")
+}
+
+// Content Template model
+model ContentTemplate {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  content     Json      // Template structure
+  isActive    Boolean   @default(true)
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  articles    Article[]
+  advancedContentGeneration AdvancedContentGeneration? @relation(fields: [siteId], references: [siteId], map: "ContentTemplateAdvancedContentGeneration")
+  contentGenerationSessions ContentGenerationSession[]
+  contentSchedules ContentSchedule[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("content_templates")
+}
+
+// Enhanced Category model with hierarchy
+model Category {
+  id          String    @id @default(cuid())
+  nameEn      String
+  nameAr      String?
+  slug        String    @unique
+  descriptionEn String?
+  descriptionAr String?
+  
+  // Hierarchy fields
+  parentId    String?
+  parent      Category? @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    Category[] @relation("CategoryHierarchy")
+  
+  // SEO fields
+  seoTitleEn  String?
+  seoTitleAr  String?
+  seoDescriptionEn String?
+  seoDescriptionAr String?
+  
+  // Analytics fields
+  articleCount Int      @default(0)
+  viewCount    Int      @default(0)
+  
+  // Site-specific fields
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relationships
+  articles    Article[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("categories")
+}
+
+// Enhanced Tag model
+model Tag {
+  id          String    @id @default(cuid())
+  nameEn      String
+  nameAr      String?
+  slug        String    @unique
+  descriptionEn String?
+  descriptionAr String?
+  color       String?   // Hex color for UI display
+  
+  // Analytics fields
+  articleCount Int      @default(0)
+  viewCount    Int      @default(0)
+  
+  // Site-specific fields
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relationships
+  articles    ArticleTag[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("tags")
+}
+
+// Article-Tag junction table
+model ArticleTag {
+  id        String   @id @default(cuid())
+  articleId String
+  tagId     String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([articleId, tagId])
+  @@map("article_tags")
+}
+
+// Enhanced Media model
+model Media {
+  id          String    @id @default(cuid())
+  filename    String
+  originalName String
+  mimeType    String
+  size        Int
+  width       Int?
+  height      Int?
+  
+  // File paths
+  path        String
+  thumbnailPath String?
+  optimizedPath String?
+  
+  // Metadata
+  altTextEn   String?
+  altTextAr   String?
+  captionEn   String?
+  captionAr   String?
+  descriptionEn String?
+  descriptionAr String?
+  
+  // Usage tracking
+  usageCount  Int       @default(0)
+  lastUsedAt  DateTime?
+  
+  // Site-specific fields
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // User relation
+  userId      String?
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  // Relationships
+  articles    Article[]
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("media")
+}
+
+// Content Workflow model
+model ContentWorkflow {
+  id          String    @id @default(cuid())
+  name        String
+  description String?
+  steps       Json      // Workflow steps configuration
+  isActive    Boolean   @default(true)
+  
+  // Site-specific fields
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("content_workflows")
+}
+
+// Content Analytics model
+model ContentAnalytics {
+  id          String    @id @default(cuid())
+  articleId   String
+  article     Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  siteId      String
+  site        Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // View metrics
+  pageViews   Int       @default(0)
+  uniqueViews Int       @default(0)
+  bounceRate  Float     @default(0)
+  avgTimeOnPage Float   @default(0)
+  
+  // Engagement metrics
+  shares      Int       @default(0)
+  comments    Int       @default(0)
+  likes       Int       @default(0)
+  
+  // Date tracking
+  date        DateTime  @db.Date
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([articleId, date])
+  @@map("content_analytics")
+}
+
+// Content Search Index model
+model ContentSearchIndex {
+  id          String    @id @default(cuid())
+  articleId   String
+  article     Article   @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  
+  // Searchable content
+  searchTextEn String   @db.Text
+  searchTextAr String   @db.Text
+  
+  // Metadata for search
+  tags        String[]  // Array of tag names
+  category    String?
+  author      String?
+  
+  // Search ranking
+  searchRank  Float     @default(0)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([articleId])
+  @@map("content_search_index")
+}
+
+model Newsletter {
+  id          String           @id @default(cuid())
+  name        String
+  subjectEn   String
+  subjectAr   String?
+  contentEn   String
+  contentAr   String?
+  status      NewsletterStatus @default(DRAFT)
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // Relations
+  subscribers NewsletterSubscriber[] @relation("NewsletterSubscribers")
+
+  @@map("newsletters")
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  locale    String   @default("en")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  newsletters Newsletter[] @relation("NewsletterSubscribers")
+
+  @@map("newsletter_subscribers")
+}
+
+model SecurityEvent {
+  id        String           @id @default(cuid())
+  siteId    String?          // Add site relation for multi-tenant support
+  eventType SecurityEventType
+  severity  SecuritySeverity @default(LOW)
+  title     String?
+  description String?
+  source    String?          // Source of the event
+  metadata  Json             @default("{}")
+  ipAddress String?
+  userAgent String?
+  location  Json?            // Country, city, etc.
+  deviceInfo Json?           // Device type, OS, browser
+  success   Boolean
+  detected  Boolean          @default(true)
+  resolved  Boolean          @default(false)
+  falsePositive Boolean      @default(false)
+  
+  // Response information
+  responseTime    DateTime?
+  responseUserId  String?
+  responseActions Json        @default("[]")
+  
+  // Timestamps
+  detectedAt DateTime        @default(now())
+  resolvedAt DateTime?
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  // Relations
+  site         Site?         @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user         User?         @relation(fields: [userId], references: [id])
+  responseUser User?         @relation("SecurityEventResponse", fields: [responseUserId], references: [id])
+
+  // User relation (optional)
+  userId    String?
+
+  @@index([siteId])
+  @@index([eventType])
+  @@index([severity])
+  @@index([detectedAt])
+  @@index([resolved])
+  @@map("security_events")
+}
+
+model SiteSetting {
+  id          String   @id @default(cuid())
+  key         String
+  value       String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, key])
+  @@map("site_settings")
+}
+
+// Enhanced Multi-Site Configuration Models
+
+model SiteConfiguration {
+  id                String   @id @default(cuid())
+  seoTitleEn        String?
+  seoTitleAr        String?
+  seoDescriptionEn  String?
+  seoDescriptionAr  String?
+  seoKeywordsEn     String?
+  seoKeywordsAr     String?
+  navigationStructure Json?
+  contentTypes      Json?
+  features          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Site relation (one-to-one)
+  siteId            String   @unique
+  site              Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("site_configurations")
+}
+
+model SiteBranding {
+  id          String   @id @default(cuid())
+  logoUrl     String?
+  logoAltEn   String?
+  logoAltAr   String?
+  primaryColor String?
+  secondaryColor String?
+  accentColor String?
+  fontFamily  String?
+  customCss   String?
+  faviconUrl  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Site relation (one-to-one)
+  siteId      String   @unique
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("site_branding")
+}
+
+model SitePermission {
+  id        String   @id @default(cuid())
+  role      UserRole
+  permissions Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Site relation
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // User relation
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, userId])
+  @@map("site_permissions")
+}
+
+// Monetization Models
+
+model Subscription {
+  id            String           @id @default(cuid())
+  planType      SubscriptionPlan
+  status        SubscriptionStatus @default(ACTIVE)
+  currency      Currency         @default(USD)
+  amount        Decimal          @db.Decimal(10, 2)
+  billingCycle  BillingCycle     @default(MONTHLY)
+  startDate     DateTime
+  endDate       DateTime?
+  trialEndDate  DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  // Site relation
+  siteId        String
+  site          Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // User relation
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  payments      Payment[]
+
+  @@map("subscriptions")
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  amount        Decimal       @db.Decimal(10, 2)
+  currency      Currency      @default(USD)
+  status        PaymentStatus @default(PENDING)
+  paymentMethod PaymentMethod
+  transactionId String?
+  gateway       PaymentGateway
+  metadata      Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Site relation
+  siteId        String
+  site          Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // User relation
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Subscription relation
+  subscriptionId String?
+  subscription   Subscription? @relation(fields: [subscriptionId], references: [id])
+
+  @@map("payments")
+}
+
+model Advertisement {
+  id          String           @id @default(cuid())
+  name        String
+  type        AdvertisementType
+  contentEn   String
+  contentAr   String?
+  imageUrl    String?
+  linkUrl     String?
+  status      AdvertisementStatus @default(ACTIVE)
+  startDate   DateTime
+  endDate     DateTime?
+  impressions Int               @default(0)
+  clicks      Int               @default(0)
+  ctr         Decimal           @db.Decimal(5, 4) @default(0)
+  revenue     Decimal           @db.Decimal(10, 2) @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // Enhanced advertising relations
+  campaign    AdCampaign?       @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  campaignId  String?
+  placement   AdPlacement?      @relation(fields: [placementId], references: [id], onDelete: SetNull)
+  placementId String?
+  performances AdPerformance[]
+  targeting   AdTargeting[]
+  creatives   AdCreative[]
+
+  @@map("advertisements")
+}
+
+// Enhanced Advertising Models
+
+model AdCampaign {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  
+  // Campaign configuration
+  type            String   // display, video, native, programmatic
+  objective       String   // awareness, consideration, conversion
+  budget          Decimal  @db.Decimal(10, 2)
+  budgetType      String   // daily, lifetime, monthly
+  currency        Currency @default(USD)
+  
+  // Campaign scheduling
+  startDate       DateTime
+  endDate         DateTime?
+  isActive        Boolean  @default(true)
+  
+  // Campaign performance
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  conversions     Int      @default(0)
+  spend           Decimal  @db.Decimal(10, 2) @default(0)
+  revenue         Decimal  @db.Decimal(10, 2) @default(0)
+  
+  // Campaign settings
+  targeting       Json?    // targeting configuration
+  optimization    Json?    // optimization settings
+  adNetwork       String?  // google, facebook, amazon, direct
+  
+  // Site relation
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  advertisements  Advertisement[]
+  placements      AdPlacement[]
+  performances    AdPerformance[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("ad_campaigns")
+}
+
+model AdPlacement {
+  id              String   @id @default(cuid())
+  name            String
+  description     String?
+  
+  // Placement configuration
+  type            String   // banner, sidebar, inline, video, native
+  position        String   // header, footer, sidebar, content, popup
+  size            String   // 728x90, 300x250, 320x50, etc.
+  responsive      Boolean  @default(true)
+  
+  // Placement settings
+  isActive        Boolean  @default(true)
+  priority        Int      @default(0)
+  fillRate        Decimal  @db.Decimal(5, 4) @default(0)
+  
+  // Targeting
+  targeting       Json?    // placement-specific targeting
+  restrictions    Json?    // content restrictions
+  
+  // Performance
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  revenue         Decimal  @db.Decimal(10, 2) @default(0)
+  
+  // Site relation
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Campaign relation
+  campaignId      String?
+  campaign        AdCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  
+  // Relations
+  advertisements  Advertisement[]
+  performances    AdPerformance[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("ad_placements")
+}
+
+model AdPerformance {
+  id              String   @id @default(cuid())
+  
+  // Performance metrics
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  conversions     Int      @default(0)
+  spend           Decimal  @db.Decimal(10, 2) @default(0)
+  revenue         Decimal  @db.Decimal(10, 2) @default(0)
+  ctr             Decimal  @db.Decimal(5, 4) @default(0)
+  cpc             Decimal  @db.Decimal(10, 4) @default(0)
+  cpm             Decimal  @db.Decimal(10, 4) @default(0)
+  roas            Decimal  @db.Decimal(5, 4) @default(0)
+  
+  // Time tracking
+  date            DateTime
+  hour            Int?
+  
+  // Geographic data
+  country         String?
+  region          String?
+  city            String?
+  
+  // Device data
+  device          String?  // desktop, mobile, tablet
+  browser         String?
+  os              String?
+  
+  // Relations
+  advertisementId String?
+  advertisement   Advertisement? @relation(fields: [advertisementId], references: [id], onDelete: SetNull)
+  
+  campaignId      String?
+  campaign        AdCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  
+  placementId     String?
+  placement       AdPlacement? @relation(fields: [placementId], references: [id], onDelete: SetNull)
+  
+  // Site relation
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([siteId, advertisementId, date, hour])
+  @@map("ad_performances")
+}
+
+model AdTargeting {
+  id              String   @id @default(cuid())
+  
+  // Targeting configuration
+  type            String   // demographic, geographic, behavioral, contextual
+  criteria        Json     // targeting criteria
+  isActive        Boolean  @default(true)
+  
+  // Relations
+  advertisementId String
+  advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("ad_targeting")
+}
+
+model AdCreative {
+  id              String   @id @default(cuid())
+  name            String
+  
+  // Creative content
+  type            String   // image, video, text, html
+  content         Json     // creative content
+  assets          Json?    // media assets
+  
+  // Creative settings
+  size            String?  // dimensions
+  format          String?  // file format
+  duration        Int?     // video duration in seconds
+  
+  // Performance
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  ctr             Decimal  @db.Decimal(5, 4) @default(0)
+  
+  // Relations
+  advertisementId String
+  advertisement   Advertisement @relation(fields: [advertisementId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("ad_creatives")
+}
+
+model AdNetwork {
+  id              String   @id @default(cuid())
+  name            String
+  type            String   // google, facebook, amazon, direct, programmatic
+  
+  // Network configuration
+  apiKey          String?
+  apiSecret       String?
+  accountId       String?
+  isActive        Boolean  @default(true)
+  
+  // Network settings
+  settings        Json?    // network-specific settings
+  capabilities    Json?    // supported ad types and features
+  
+  // Performance
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  revenue         Decimal  @db.Decimal(10, 2) @default(0)
+  
+  // Site relation
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("ad_networks")
+}
+
+model AdBlocking {
+  id              String   @id @default(cuid())
+  
+  // Blocking detection
+  detected        Boolean  @default(false)
+  blockRate       Decimal  @db.Decimal(5, 4) @default(0)
+  userAgent       String?
+  ipAddress       String?
+  
+  // Recovery actions
+  action          String   // redirect, alternative, message
+  alternativeUrl  String?
+  message         String?
+  
+  // Site relation
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("ad_blocking")
+}
+
+model AdOptimization {
+  id              String   @id @default(cuid())
+  
+  // Optimization configuration
+  type            String   // placement, creative, targeting, bidding
+  strategy        String   // ctr, cpc, roas, revenue
+  isActive        Boolean  @default(true)
+  
+  // Optimization settings
+  settings        Json?    // optimization parameters
+  rules           Json?    // optimization rules
+  
+  // Performance tracking
+  beforeMetrics   Json?    // metrics before optimization
+  afterMetrics    Json?    // metrics after optimization
+  improvement     Decimal? @db.Decimal(5, 4)
+  
+  // Site relation
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("ad_optimizations")
+}
+
+// Analytics and Business Intelligence Models
+
+model Analytics {
+  id          String   @id @default(cuid())
+  pageViews   Int      @default(0)
+  uniqueVisitors Int   @default(0)
+  bounceRate  Decimal  @db.Decimal(5, 4) @default(0)
+  avgSessionDuration Int @default(0)
+  date        DateTime
+  createdAt   DateTime @default(now())
+
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, date])
+  @@map("analytics")
+}
+
+model RevenueAnalytics {
+  id            String   @id @default(cuid())
+  revenue       Decimal  @db.Decimal(10, 2) @default(0)
+  currency      Currency @default(USD)
+  subscriptionRevenue Decimal @db.Decimal(10, 2) @default(0)
+  advertisingRevenue Decimal @db.Decimal(10, 2) @default(0)
+  otherRevenue  Decimal  @db.Decimal(10, 2) @default(0)
+  date          DateTime
+  createdAt     DateTime @default(now())
+
+  // Site relation
+  siteId        String
+  site          Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, date])
+  @@map("revenue_analytics")
+}
+
+model UserAnalytics {
+  id              String   @id @default(cuid())
+  userId          String
+  pageViews       Int      @default(0)
+  timeOnSite      Int      @default(0)
+  articlesRead    Int      @default(0)
+  lastVisit       DateTime
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Site relation
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // User relation
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, userId])
+  @@map("user_analytics")
+}
+
+
+
+model SiteAnalytics {
+  id                String   @id @default(cuid())
+  totalRevenue      Decimal  @db.Decimal(10, 2) @default(0)
+  totalSubscribers  Int      @default(0)
+  totalArticles     Int      @default(0)
+  avgEngagement     Decimal  @db.Decimal(5, 4) @default(0)
+  conversionRate    Decimal  @db.Decimal(5, 4) @default(0)
+  date              DateTime
+  createdAt         DateTime @default(now())
+
+  // Site relation
+  siteId            String
+  site              Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, date])
+  @@map("site_analytics")
+}
+
+// AI and Automation Models
+
+model AIConfiguration {
+  id              String   @id @default(cuid())
+  personality     String   @default("professional")
+  tone            String   @default("neutral")
+  languageStyle   String   @default("modern")
+  contentLength   String   @default("medium")
+  seoOptimization Boolean  @default(true)
+  autoPublish     Boolean  @default(false)
+  qualityThreshold Decimal @db.Decimal(3, 2) @default(0.8)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Site relation (one-to-one)
+  siteId          String   @unique
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("ai_configurations")
+}
+
+model ContentGeneration {
+  id              String           @id @default(cuid())
+  prompt          String
+  generatedContent String
+  contentType     ContentType
+  quality         Decimal          @db.Decimal(3, 2)
+  status          GenerationStatus @default(PENDING)
+  metadata        Json?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Site relation
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("content_generations")
+}
+
+model AutomationWorkflow {
+  id          String           @id @default(cuid())
+  name        String
+  description String?
+  workflow    Json
+  status      WorkflowStatus   @default(ACTIVE)
+  lastRun     DateTime?
+  nextRun     DateTime?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("automation_workflows")
+}
+
+model ContentOptimization {
+  id              String   @id @default(cuid())
+  seoScore        Int
+  readabilityScore Int
+  performanceScore Int
+  suggestions     Json?
+  optimizedContent String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Site relation
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // Article relation
+  articleId       String
+  article         Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, articleId])
+  @@map("content_optimizations")
+}
+
+// Advanced Personality Configuration
+model AdvancedPersonality {
+  id                    String    @id @default(cuid())
+  siteId                String    @unique
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Base personality
+  basePersonality       Json      // base personality configuration
+  personalityTemplate   String?   // reference to template
+  
+  // Dynamic configuration
+  dynamicAdaptation     Boolean   @default(true)
+  learningEnabled       Boolean   @default(true)
+  adaptationRate        Float     @default(0.1)
+  
+  // Cultural configuration
+  culturalContext       Json      // cultural adaptation settings
+  linguisticStyle       Json      // linguistic style preferences
+  regionalPreferences   Json      // regional content preferences
+  
+  // Audience targeting
+  audienceSegments      Json      // audience segment targeting
+  targetingEnabled      Boolean   @default(true)
+  
+  // Performance configuration
+  performanceTracking   Boolean   @default(true)
+  optimizationEnabled   Boolean   @default(true)
+  aBTestingEnabled      Boolean   @default(true)
+  
+  // Model configuration
+  modelVersion          String    // current model version
+  fineTunedModel        String?   // fine-tuned model reference
+  trainingDataVersion   String?   // training data version
+  
+  // Relations
+  performanceMetrics    PersonalityPerformance[]
+  trainingData          PersonalityTrainingData[]
+  abTests               PersonalityABTest[]
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// Personality Performance Analytics
+model PersonalityPerformance {
+  id                    String    @id @default(cuid())
+  personalityId         String
+  personality           AdvancedPersonality @relation(fields: [personalityId], references: [id])
+  
+  // Performance metrics
+  contentQualityScore   Float
+  audienceEngagement    Float
+  culturalRelevance     Float
+  consistencyScore      Float
+  
+  // Content metrics
+  contentCount          Int
+  publishedCount        Int
+  rejectedCount         Int
+  
+  // Audience metrics
+  audienceSegment       String?
+  segmentPerformance    Float?
+  
+  // Temporal data
+  measurementDate       DateTime
+  timeRange             String    // day, week, month
+  
+  createdAt             DateTime  @default(now())
+}
+
+// Personality Training Data
+model PersonalityTrainingData {
+  id                    String    @id @default(cuid())
+  personalityId         String
+  personality           AdvancedPersonality @relation(fields: [personalityId], references: [id])
+  
+  // Training data
+  contentType           String    // article, social, etc.
+  content               String    // training content
+  metadata              Json      // content metadata
+  
+  // Performance data
+  performanceScore      Float?
+  audienceFeedback      Json?     // audience feedback
+  engagementMetrics     Json?     // engagement data
+  
+  // Quality data
+  qualityScore          Float?
+  culturalScore         Float?
+  relevanceScore        Float?
+  
+  // Versioning
+  dataVersion           String
+  isActive              Boolean   @default(true)
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// A/B Testing Results
+model PersonalityABTest {
+  id                    String    @id @default(cuid())
+  personalityId         String
+  personality           AdvancedPersonality @relation(fields: [personalityId], references: [id])
+  
+  // Test configuration
+  testName              String
+  variantA              Json      // variant A configuration
+  variantB              Json      // variant B configuration
+  
+  // Test results
+  variantAPerformance   Float?
+  variantBPerformance   Float?
+  statisticalSignificance Float?
+  winner                String?   // A, B, or null
+  
+  // Test status
+  status                String    // running, completed, stopped
+  startDate             DateTime
+  endDate               DateTime?
+  
+  // Sample size
+  sampleSizeA           Int       @default(0)
+  sampleSizeB           Int       @default(0)
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// Personality Templates
+model PersonalityTemplate {
+  id                    Int       @id @default(autoincrement())
+  
+  // Template configuration
+  name                  String    @unique
+  description           String
+  industry              String    // cybersecurity, finance, tech, etc.
+  baseConfiguration     Json      // base personality configuration
+  
+  // Template features
+  features              Json      // supported features
+  culturalSupport       Json      // cultural adaptation support
+  audienceTargeting     Json      // audience targeting capabilities
+  
+  // Versioning
+  version               String    @default("1.0.0")
+  isActive              Boolean   @default(true)
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// Advanced Content Generation Configuration
+model AdvancedContentGeneration {
+  id                    String    @id @default(cuid())
+  siteId                String    @unique
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Generation configuration
+  contentTypes          Json      // supported content types
+  generationTemplates   Json      // content generation templates
+  optimizationSettings  Json      // optimization configuration
+  
+  // Collaboration settings
+  collaborationEnabled  Boolean   @default(true)
+  realTimeEditing       Boolean   @default(true)
+  versionControl        Boolean   @default(true)
+  
+  // Quality settings
+  qualityThresholds     Json      // quality thresholds
+  approvalWorkflows     Json      // approval workflow configuration
+  plagiarismDetection   Boolean   @default(true)
+  
+  // Scheduling settings
+  autoScheduling        Boolean   @default(true)
+  publishingWorkflows   Json      // publishing workflow configuration
+  multiPlatformPublish  Boolean   @default(true)
+  
+  // Personalization settings
+  personalizationEnabled Boolean  @default(true)
+  audienceSegments      Json      // audience segmentation
+  culturalAdaptation    Boolean   @default(true)
+  
+  // Relations
+  templates             ContentTemplate[]
+  sessions              ContentGenerationSession[]
+  schedules             ContentSchedule[]
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// Content Templates
+
+
+// Content Generation Sessions
+model ContentGenerationSession {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  advancedConfig        AdvancedContentGeneration? @relation(fields: [siteId], references: [siteId], map: "ContentGenerationSessionAdvancedContentGeneration")
+  templateId            String?
+  template              ContentTemplate? @relation(fields: [templateId], references: [id])
+  
+  // Session details
+  sessionType           String    // single, batch, campaign
+  contentType           String    // article, social, newsletter, etc.
+  
+  // Generation parameters
+  generationParams      Json      // generation parameters
+  optimizationSettings  Json      // optimization settings
+  personalizationData   Json      // personalization data
+  
+  // Session status
+  status                String    // draft, generating, completed, failed
+  progress              Float     @default(0)
+  
+  // Performance metrics
+  generationTime        Int?      // milliseconds
+  qualityScore          Float?
+  optimizationScore     Float?
+  
+  // Collaboration
+  collaborators         Json      // list of collaborators
+  versionHistory        Json      // version history
+  
+  // Relations
+  versions              ContentVersion[]
+  collaborations        ContentCollaboration[]
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// Content Versions
+model ContentVersion {
+  id                    String    @id @default(cuid())
+  sessionId             String
+  session               ContentGenerationSession @relation(fields: [sessionId], references: [id])
+  
+  // Version details
+  versionNumber         Int
+  content               String    // generated content
+  metadata              Json      // content metadata
+  
+  // Quality metrics
+  qualityScore          Float?
+  seoScore              Float?
+  readabilityScore      Float?
+  engagementScore       Float?
+  
+  // Optimization data
+  optimizationData      Json      // optimization results
+  improvementSuggestions Json     // improvement suggestions
+  
+  // Collaboration
+  authorId              Int?
+  collaborators         Json      // list of contributors
+  comments              Json      // comments and feedback
+  
+  // Version control
+  parentVersion         String?   // parent version ID
+  changeSummary         String?   // summary of changes
+  
+  // Relations
+  qualityMetrics        ContentQualityMetrics?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// Content Scheduling
+model ContentSchedule {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  advancedConfig        AdvancedContentGeneration? @relation(fields: [siteId], references: [siteId], map: "ContentScheduleAdvancedContentGeneration")
+  templateId            String?
+  template              ContentTemplate? @relation(fields: [templateId], references: [id])
+  
+  // Schedule configuration
+  scheduleName          String
+  scheduleType          String    // single, recurring, campaign
+  scheduleConfig        Json      // schedule configuration
+  
+  // Content configuration
+  contentType           String
+  generationParams      Json      // generation parameters
+  
+  // Publishing configuration
+  publishChannels       Json      // publishing channels
+  publishSettings       Json      // publishing settings
+  
+  // Schedule status
+  status                String    // active, paused, completed
+  nextRun               DateTime?
+  lastRun               DateTime?
+  
+  // Performance tracking
+  successRate           Float     @default(0)
+  totalPublished        Int       @default(0)
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// Content Collaboration
+model ContentCollaboration {
+  id                    String    @id @default(cuid())
+  sessionId             String
+  session               ContentGenerationSession @relation(fields: [sessionId], references: [id])
+  
+  // Collaboration details
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id])
+  role                  String    // author, editor, reviewer, approver
+  permissions           Json      // collaboration permissions
+  
+  // Activity tracking
+  lastActivity          DateTime  @default(now())
+  activityHistory       Json      // activity history
+  
+  // Comments and feedback
+  comments              Json      // comments and feedback
+  suggestions           Json      // improvement suggestions
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// Content Quality Metrics
+model ContentQualityMetrics {
+  id                    String    @id @default(cuid())
+  versionId             String    @unique
+  version               ContentVersion @relation(fields: [versionId], references: [id], onDelete: Cascade)
+  
+  // Quality metrics
+  overallScore          Float
+  contentQuality        Float
+  seoOptimization       Float
+  readabilityScore      Float
+  engagementPrediction  Float
+  
+  // Detailed analysis
+  keywordDensity        Json      // keyword density analysis
+  contentStructure      Json      // content structure analysis
+  toneAnalysis          Json      // tone and style analysis
+  grammarCheck          Json      // grammar and spelling check
+  
+  // Optimization suggestions
+  improvementSuggestions Json     // improvement suggestions
+  priorityActions       Json      // high-priority actions
+  
+  // Performance tracking
+  lastAnalyzed          DateTime  @default(now())
+  analysisHistory       Json      // analysis history
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// Predictive Analytics & Personalization Models
+
+// User Behavior Tracking
+model UserBehaviorEvent {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // User identification
+  userId                String?   // nullable for anonymous users
+  user                  User?     @relation(fields: [userId], references: [id])
+  sessionId             String    // browser session ID
+  deviceId              String?   // device fingerprint
+  
+  // Event details
+  eventType             String    // page_view, click, scroll, form_submit, etc.
+  eventCategory         String    // navigation, engagement, conversion, etc.
+  eventAction           String    // specific action within category
+  eventLabel            String?   // additional context
+  
+  // Page/Content context
+  pageUrl               String
+  pageTitle             String?
+  referrerUrl           String?
+  contentId             String?   // article, category, etc.
+  contentType           String?   // article, category, tag, etc.
+  
+  // User context
+  userAgent             String?
+  ipAddress             String?
+  location              Json?     // geo-location data
+  deviceInfo            Json?     // device characteristics
+  
+  // Engagement metrics
+  timeOnPage            Int?      // seconds
+  scrollDepth           Int?      // percentage
+  interactionCount      Int       @default(0)
+  
+  // Custom properties
+  properties            Json      // additional event properties
+  
+  // Privacy compliance
+  consentGiven          Boolean   @default(false)
+  dataRetention         DateTime? // when this data should be deleted
+  
+  createdAt             DateTime  @default(now())
+  
+  @@index([siteId, createdAt])
+  @@index([userId, createdAt])
+  @@index([eventType, createdAt])
+  @@index([contentId, createdAt])
+}
+
+// User Profile & Preferences
+model UserProfile {
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+  user                  User      @relation(fields: [userId], references: [id])
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Demographics
+  age                   Int?
+  gender                String?
+  location              Json?     // geo-location data
+  language              String    @default("en")
+  timezone              String?
+  
+  // Interests & Preferences
+  interests             Json      // user interests and preferences
+  contentPreferences    Json      // content type preferences
+  readingLevel          String?   // beginner, intermediate, advanced
+  topicsOfInterest      Json      // specific topics user is interested in
+  
+  // Behavior patterns
+  activityLevel         String    @default("medium") // low, medium, high
+  preferredTime         Json?     // preferred time for content consumption
+  devicePreference      Json?     // preferred devices and platforms
+  
+  // Personalization settings
+  personalizationEnabled Boolean  @default(true)
+  recommendationSettings Json     // recommendation preferences
+  privacySettings       Json      // privacy and data collection preferences
+  
+  // Analytics
+  totalSessions         Int       @default(0)
+  totalPageViews        Int       @default(0)
+  totalEngagement       Int       @default(0)
+  lastActivity          DateTime  @default(now())
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+}
+
+// ML Models & Predictions
+model MLModel {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Model information
+  modelName             String
+  modelType             String    // classification, regression, recommendation
+  modelVersion          String
+  modelDescription      String?
+  
+  // Model configuration
+  algorithm             String    // algorithm used (random_forest, neural_network, etc.)
+  hyperparameters       Json      // model hyperparameters
+  featureColumns        Json      // input features
+  targetColumn          String    // target variable
+  
+  // Training information
+  trainingDataSize      Int
+  trainingAccuracy      Float
+  validationAccuracy    Float
+  testAccuracy          Float
+  
+  // Model performance
+  precision             Float?
+  recall                Float?
+  f1Score               Float?
+  auc                   Float?
+  
+  // Model files
+  modelPath             String    // path to model file
+  modelSize             Int?      // model file size in bytes
+  modelHash             String?   // model file hash for integrity
+  
+  // Deployment status
+  status                String    @default("training") // training, active, inactive, deprecated
+  isActive              Boolean   @default(false)
+  deployedAt            DateTime?
+  
+  // Monitoring
+  lastPrediction        DateTime?
+  totalPredictions      Int       @default(0)
+  averageResponseTime   Float?    // milliseconds
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  predictions           UserPrediction[]
+  analyticsEngines      AnalyticsEngine[]
+  
+  @@unique([siteId, modelName, modelVersion])
+}
+
+// User Predictions
+model UserPrediction {
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id])
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  modelId               String
+  model                 MLModel   @relation(fields: [modelId], references: [id])
+  
+  // Prediction details
+  predictionType        String    // churn, engagement, conversion, etc.
+  predictionValue       Float     // predicted probability or value
+  predictionConfidence  Float     // confidence score (0-1)
+  predictionClass       String?   // predicted class for classification
+  
+  // Input features
+  inputFeatures         Json      // features used for prediction
+  featureImportance     Json?     // feature importance scores
+  
+  // Context
+  context               Json?     // additional context for prediction
+  triggerEvent          String?   // event that triggered prediction
+  
+  // Validation
+  actualValue           Float?    // actual value for validation
+  actualClass           String?   // actual class for validation
+  isCorrect             Boolean?  // whether prediction was correct
+  
+  // Usage tracking
+  usedInPersonalization Boolean   @default(false)
+  usedInRecommendation  Boolean   @default(false)
+  usedInOptimization    Boolean   @default(false)
+  
+  createdAt             DateTime  @default(now())
+  validatedAt           DateTime?
+  
+  // Relations
+  analyticsEngines      AnalyticsEngine[]
+  
+  @@index([userId, predictionType, createdAt])
+  @@index([siteId, predictionType, createdAt])
+}
+
+// Content Recommendations
+model ContentRecommendation {
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id])
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Recommendation details
+  contentId             String    // recommended content ID
+  contentType           String    // article, category, tag, etc.
+  recommendationType    String    // collaborative, content-based, hybrid
+  recommendationScore   Float     // recommendation strength (0-1)
+  
+  // Algorithm details
+  algorithm             String    // algorithm used for recommendation
+  modelVersion          String?   // ML model version used
+  features              Json?     // features used for recommendation
+  
+  // Context
+  context               Json?     // recommendation context
+  triggerEvent          String?   // event that triggered recommendation
+  
+  // User interaction
+  isShown               Boolean   @default(false)
+  isClicked             Boolean   @default(false)
+  isEngaged             Boolean   @default(false)
+  timeSpent             Int?      // seconds spent on recommended content
+  
+  // Performance tracking
+  clickThroughRate      Float?    // CTR for this recommendation
+  engagementRate        Float?    // engagement rate for this recommendation
+  
+  // Expiration
+  expiresAt             DateTime? // when recommendation expires
+  isExpired             Boolean   @default(false)
+  
+  createdAt             DateTime  @default(now())
+  shownAt               DateTime?
+  clickedAt             DateTime?
+  
+  @@index([userId, recommendationType, createdAt])
+  @@index([contentId, recommendationType, createdAt])
+}
+
+// A/B Testing Framework
+model ABTest {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Test configuration
+  testName              String
+  testDescription       String?
+  testType              String    // content, layout, feature, etc.
+  testHypothesis        String?   // what we're testing
+  
+  // Test variants
+  variants              Json      // test variants configuration
+  controlVariant        String    // control variant name
+  treatmentVariants     Json      // treatment variants
+  
+  // Traffic allocation
+  trafficAllocation     Json      // traffic allocation per variant
+  targetAudience        Json?     // audience targeting rules
+  
+  // Test parameters
+  startDate             DateTime
+  endDate               DateTime?
+  isActive              Boolean   @default(false)
+  isPaused              Boolean   @default(false)
+  
+  // Success metrics
+  primaryMetric         String    // primary success metric
+  secondaryMetrics      Json      // secondary success metrics
+  conversionGoals       Json      // conversion goals
+  
+  // Statistical parameters
+  significanceLevel     Float     @default(0.05)
+  statisticalPower      Float     @default(0.8)
+  minimumSampleSize     Int       @default(1000)
+  
+  // Results
+  currentSampleSize     Int       @default(0)
+  statisticalSignificance Boolean @default(false)
+  winner                String?   // winning variant
+  confidenceLevel       Float?    // confidence level for winner
+  
+  // Performance tracking
+  totalConversions      Int       @default(0)
+  totalRevenue          Float     @default(0)
+  averageOrderValue     Float     @default(0)
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  assignments           ABTestAssignment[]
+  
+  @@unique([siteId, testName])
+}
+
+// A/B Test Assignments
+model ABTestAssignment {
+  id                    String    @id @default(cuid())
+  testId                String
+  test                  ABTest    @relation(fields: [testId], references: [id])
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id])
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Assignment details
+  assignedVariant       String    // assigned variant
+  assignmentMethod      String    @default("random") // random, user_id_hash, etc.
+  
+  // Exposure tracking
+  isExposed             Boolean   @default(false)
+  firstExposureAt       DateTime?
+  lastExposureAt        DateTime?
+  exposureCount         Int       @default(0)
+  
+  // Interaction tracking
+  interactions          Json      // user interactions with test
+  conversions           Json      // conversion events
+  revenue               Float     @default(0)
+  
+  // Assignment metadata
+  assignmentHash        String?   // hash for consistent assignment
+  assignmentReason      String?   // reason for assignment
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@unique([testId, userId])
+  @@index([testId, assignedVariant])
+}
+
+// Personalization Rules
+model PersonalizationRule {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Rule configuration
+  ruleName              String
+  ruleDescription       String?
+  ruleType              String    // content, layout, feature, etc.
+  ruleCategory          String    // targeting, optimization, engagement
+  
+  // Rule conditions
+  conditions            Json      // rule conditions and logic
+  targetAudience        Json?     // audience targeting
+  contentFilters        Json?     // content filtering rules
+  
+  // Rule actions
+  actions               Json      // actions to take when rule matches
+  priority              Int       @default(0) // rule priority (higher = more important)
+  
+  // Rule status
+  isActive              Boolean   @default(true)
+  isEnabled             Boolean   @default(true)
+  
+  // Performance tracking
+  matchCount            Int       @default(0)
+  actionCount           Int       @default(0)
+  successRate           Float     @default(0)
+  
+  // Scheduling
+  startDate             DateTime?
+  endDate               DateTime?
+  schedule              Json?     // recurring schedule configuration
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@unique([siteId, ruleName])
+}
+
+// Analytics Dashboard Configuration
+model AnalyticsDashboard {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Dashboard configuration
+  dashboardName         String
+  dashboardDescription  String?
+  dashboardType         String    // overview, detailed, custom, etc.
+  
+  // Layout and widgets
+  layout                Json      // dashboard layout configuration
+  widgets               Json      // widget configurations
+  filters               Json      // dashboard filters
+  
+  // Access control
+  isPublic              Boolean   @default(false)
+  allowedRoles          Json      // roles that can access this dashboard
+  allowedUsers          Json      // specific users that can access
+  
+  // Refresh settings
+  autoRefresh           Boolean   @default(false)
+  refreshInterval       Int?      // refresh interval in seconds
+  
+  // Performance
+  lastAccessed          DateTime?
+  accessCount           Int       @default(0)
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  // Relations
+  dataWarehouses DataWarehouse[]
+  analyticsReports AnalyticsReport[]
+  
+  @@unique([siteId, dashboardName])
+}
+
+// Content Optimization Models
+
+// SEO Optimization
+model SEOOptimization {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Content reference
+  contentId             String    // article, page, etc.
+  contentType           String    // article, page, category, etc.
+  
+  // SEO metrics
+  seoScore              Float     @default(0) // 0-100
+  titleOptimization     Float     @default(0) // 0-100
+  descriptionOptimization Float   @default(0) // 0-100
+  keywordOptimization   Float     @default(0) // 0-100
+  urlOptimization       Float     @default(0) // 0-100
+  internalLinking       Float     @default(0) // 0-100
+  
+  // Meta tags
+  metaTitle             String?
+  metaDescription       String?
+  metaKeywords          Json      // array of keywords
+  canonicalUrl          String?
+  robotsMeta            String?
+  
+  // Structured data
+  schemaMarkup          Json      // JSON-LD structured data
+  schemaType            String?   // Article, WebPage, etc.
+  schemaValid           Boolean   @default(false)
+  
+  // Content analysis
+  keywordDensity        Json      // keyword density analysis
+  contentLength         Int       @default(0)
+  headingStructure      Json      // heading hierarchy
+  imageAltText          Json      // image alt text analysis
+  
+  // Optimization status
+  isOptimized           Boolean   @default(false)
+  lastOptimized         DateTime?
+  optimizationHistory   Json      // optimization history
+  
+  // Recommendations
+  recommendations       Json      // optimization recommendations
+  priorityActions       Json      // high-priority actions
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@unique([siteId, contentId, contentType])
+}
+
+// Image Optimization
+model ImageOptimization {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Image reference
+  imageId               String
+  originalPath           String
+  originalSize           Int       // bytes
+  originalFormat         String
+  
+  // Optimization details
+  optimizedPath          String?
+  optimizedSize          Int?      // bytes
+  optimizedFormat        String?
+  compressionRatio       Float?    // compression percentage
+  
+  // WebP conversion
+  webpPath              String?
+  webpSize              Int?      // bytes
+  webpCompressionRatio   Float?
+  
+  // Responsive images
+  responsiveImages      Json      // different sizes for responsive design
+  lazyLoadingEnabled    Boolean   @default(true)
+  
+  // SEO optimization
+  altText               String?
+  altTextGenerated      Boolean   @default(false)
+  titleAttribute        String?
+  filenameOptimized     Boolean   @default(false)
+  
+  // Performance metrics
+  loadTime              Float?    // milliseconds
+  optimizationScore     Float     @default(0) // 0-100
+  
+  // Processing status
+  processingStatus      String    @default("pending") // pending, processing, completed, failed
+  processingError       String?
+  lastProcessed         DateTime?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@unique([siteId, imageId])
+}
+
+// Performance Monitoring
+model PerformanceMetrics {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Page reference
+  pageUrl               String
+  pageTitle             String?
+  
+  // Core Web Vitals
+  largestContentfulPaint Float?   // LCP in milliseconds
+  firstInputDelay        Float?   // FID in milliseconds
+  cumulativeLayoutShift  Float?   // CLS score
+  
+  // Additional metrics
+  firstContentfulPaint  Float?    // FCP in milliseconds
+  timeToInteractive     Float?    // TTI in milliseconds
+  totalBlockingTime     Float?    // TBT in milliseconds
+  speedIndex            Float?    // SI in milliseconds
+  
+  // Performance scores
+  performanceScore      Float     @default(0) // 0-100
+  accessibilityScore    Float     @default(0) // 0-100
+  bestPracticesScore    Float     @default(0) // 0-100
+  seoScore              Float     @default(0) // 0-100
+  
+  // Performance budget
+  budgetExceeded        Boolean   @default(false)
+  budgetThresholds      Json      // performance budget thresholds
+  
+  // Monitoring details
+  deviceType            String    // desktop, mobile, tablet
+  connectionType        String?   // 4g, 3g, 2g, slow-2g
+  userAgent             String?
+  
+  // Alert status
+  alertTriggered        Boolean   @default(false)
+  alertType             String?   // performance, accessibility, seo
+  
+  createdAt             DateTime  @default(now())
+  
+  @@index([siteId, pageUrl, createdAt])
+  @@index([performanceScore, createdAt])
+}
+
+// Accessibility Compliance
+model AccessibilityAudit {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Page reference
+  pageUrl               String
+  pageTitle             String?
+  
+  // WCAG compliance
+  wcagLevel             String    // A, AA, AAA
+  wcagScore             Float     @default(0) // 0-100
+  wcagCompliant         Boolean   @default(false)
+  
+  // Accessibility issues
+  totalIssues           Int       @default(0)
+  criticalIssues        Int       @default(0)
+  seriousIssues         Int       @default(0)
+  moderateIssues        Int       @default(0)
+  minorIssues           Int       @default(0)
+  
+  // Issue details
+  issues                Json      // detailed issue list
+  automatedFixes        Json      // fixes that can be applied automatically
+  manualFixes           Json      // fixes requiring manual intervention
+  
+  // Specific compliance areas
+  colorContrast         Float     @default(0) // 0-100
+  keyboardNavigation    Float     @default(0) // 0-100
+  screenReaderSupport   Float     @default(0) // 0-100
+  semanticStructure     Float     @default(0) // 0-100
+  altTextCoverage       Float     @default(0) // 0-100
+  
+  // Audit details
+  auditTool             String    // axe-core, WAVE, etc.
+  auditVersion          String?
+  auditDuration         Int?      // milliseconds
+  
+  // Fix status
+  fixesApplied          Int       @default(0)
+  fixesPending          Int       @default(0)
+  lastFixed             DateTime?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@index([siteId, pageUrl, createdAt])
+  @@index([wcagScore, createdAt])
+}
+
+// Content Quality Analysis
+model ContentQualityAnalysis {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Content reference
+  contentId             String
+  contentType           String    // article, page, etc.
+  
+  // Quality metrics
+  overallScore          Float     @default(0) // 0-100
+  readabilityScore      Float     @default(0) // 0-100
+  structureScore        Float     @default(0) // 0-100
+  engagementScore       Float     @default(0) // 0-100
+  seoScore              Float     @default(0) // 0-100
+  
+  // Readability analysis
+  fleschKincaidGrade    Float?    // Flesch-Kincaid Grade Level
+  fleschReadingEase     Float?    // Flesch Reading Ease
+  gunningFogIndex       Float?    // Gunning Fog Index
+  smogIndex             Float?    // SMOG Index
+  
+  // Content structure
+  wordCount             Int       @default(0)
+  sentenceCount         Int       @default(0)
+  paragraphCount        Int       @default(0)
+  headingCount          Int       @default(0)
+  imageCount            Int       @default(0)
+  linkCount             Int       @default(0)
+  
+  // Structure analysis
+  headingHierarchy      Json      // heading structure analysis
+  paragraphLengths      Json      // paragraph length distribution
+  sentenceLengths       Json      // sentence length distribution
+  
+  // Engagement prediction
+  predictedEngagement   Float     @default(0) // 0-100
+  engagementFactors     Json      // factors affecting engagement
+  bounceRatePrediction  Float?    // predicted bounce rate
+  
+  // Content analysis
+  keywordUsage          Json      // keyword usage analysis
+  topicRelevance        Float     @default(0) // 0-100
+  contentUniqueness     Float     @default(0) // 0-100
+  plagiarismScore       Float?    // plagiarism detection score
+  
+  // Improvement suggestions
+  suggestions           Json      // content improvement suggestions
+  priorityImprovements  Json      // high-priority improvements
+  aiRecommendations     Json      // AI-generated recommendations
+  
+  // Analysis metadata
+  analysisTool          String    // tool used for analysis
+  analysisVersion       String?
+  analysisDuration      Int?      // milliseconds
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@unique([siteId, contentId, contentType])
+}
+
+// Optimization Triggers
+model OptimizationTrigger {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Trigger configuration
+  triggerName           String
+  triggerType           String    // performance, seo, accessibility, quality
+  triggerCondition      Json      // conditions that activate the trigger
+  triggerThreshold      Float     // threshold value
+  
+  // Action configuration
+  actionType            String    // auto-fix, alert, report
+  actionParameters      Json      // parameters for the action
+  actionPriority        String    @default("medium") // low, medium, high, critical
+  
+  // Trigger status
+  isActive              Boolean   @default(true)
+  isEnabled             Boolean   @default(true)
+  
+  // Execution tracking
+  lastTriggered         DateTime?
+  triggerCount          Int       @default(0)
+  successCount          Int       @default(0)
+  failureCount          Int       @default(0)
+  
+  // Performance tracking
+  averageExecutionTime  Float?    // milliseconds
+  lastExecutionTime     Float?    // milliseconds
+  lastError             String?
+  
+  // Scheduling
+  schedule              Json?     // cron-like schedule
+  nextExecution         DateTime?
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@unique([siteId, triggerName])
+}
+
+// Performance Budgets
+model PerformanceBudget {
+  id                    String    @id @default(cuid())
+  siteId                String
+  site                  Site      @relation(fields: [siteId], references: [id])
+  
+  // Budget configuration
+  budgetName            String
+  budgetType            String    // page, resource, metric
+  budgetTarget          String    // specific target (URL, resource type, metric)
+  
+  // Budget limits
+  maxLCP                Float?    // Largest Contentful Paint (ms)
+  maxFID                Float?    // First Input Delay (ms)
+  maxCLS                Float?    // Cumulative Layout Shift
+  maxFCP                Float?    // First Contentful Paint (ms)
+  maxTTI                Float?    // Time to Interactive (ms)
+  maxTBT                Float?    // Total Blocking Time (ms)
+  maxSize               Int?      // page size in bytes
+  maxRequests           Int?      // number of requests
+  
+  // Budget enforcement
+  enforcementLevel      String    @default("warning") // warning, error, critical
+  autoOptimize          Boolean   @default(false)
+  optimizationActions   Json      // actions to take when budget exceeded
+  
+  // Monitoring
+  currentValue          Float?    // current metric value
+  budgetExceeded        Boolean   @default(false)
+  exceedanceCount       Int       @default(0)
+  lastExceeded          DateTime?
+  
+  // Alert configuration
+  alertEnabled          Boolean   @default(true)
+  alertThreshold        Float?    // percentage of budget to trigger alert
+  alertRecipients       Json      // list of alert recipients
+  
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@unique([siteId, budgetName])
+}
+
+// Enums
+enum UserRole {
+  USER
+  EDITOR
+  PUBLISHER
+  ADMIN
+}
+
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+  DELETED
+}
+
+enum WorkflowState {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  PUBLISHED
+  ARCHIVED
+  REJECTED
+}
+
+enum NewsletterStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+}
+
+enum SecurityEventType {
+  LOGIN_SUCCESS
+  LOGIN_FAILURE
+  LOGOUT
+  PASSWORD_CHANGE
+  PASSWORD_RESET
+  MFA_ENABLED
+  MFA_DISABLED
+  MFA_VERIFICATION
+  ACCOUNT_LOCKED
+  ACCOUNT_UNLOCKED
+  SUSPICIOUS_ACTIVITY
+  DATA_ACCESS
+  DATA_EXPORT
+  DATA_DELETION
+  PERMISSION_CHANGE
+  ADMIN_ACTION
+  API_ACCESS
+  SYSTEM_ACCESS
+  SECURITY_POLICY_VIOLATION
+  VULNERABILITY_DETECTED
+  MALWARE_DETECTED
+  INTRUSION_ATTEMPT
+  DDoS_ATTACK
+  SQL_INJECTION
+  XSS_ATTEMPT
+  CSRF_ATTEMPT
+  UNAUTHORIZED_ACCESS
+  DATA_BREACH
+  COMPLIANCE_VIOLATION
+  OTHER
+}
+
+// Enhanced Enums for New Models
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PREMIUM
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PAST_DUE
+  TRIAL
+}
+
+enum Currency {
+  USD
+  EUR
+  AED
+  GBP
+  CAD
+}
+
+enum BillingCycle {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  REFUNDED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYPAL
+  BANK_TRANSFER
+  CRYPTO
+}
+
+enum PaymentGateway {
+  STRIPE
+  PAYPAL
+  SQUARE
+  CRYPTO_GATEWAY
+}
+
+enum AdvertisementType {
+  DISPLAY
+  VIDEO
+  NATIVE
+  BANNER
+  POPUP
+}
+
+enum AdvertisementStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  DRAFT
+}
+
+enum ContentType {
+  ARTICLE
+  NEWSLETTER
+  SOCIAL_POST
+  EMAIL
+  ADVERTISEMENT
+}
+
+enum GenerationStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+}
+
+enum WorkflowStatus {
+  ACTIVE
+  PAUSED
+  COMPLETED
+  ERROR
+}
+
+// Business Intelligence & Analytics Models
+
+model DataWarehouse {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  
+  // Data warehouse configuration
+  type        String   // postgresql, bigquery, snowflake, redshift
+  connection  Json     // connection configuration
+  schema      String   // database schema
+  isActive    Boolean  @default(true)
+  
+  // Performance settings
+  refreshInterval Int   @default(3600) // seconds
+  retentionDays  Int    @default(730)  // days
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  etlJobs     ETLJob[]
+  dataSources DataSource[]
+  dashboards  AnalyticsDashboard[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("data_warehouses")
+}
+
+model DataSource {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  
+  // Data source configuration
+  type        String   // internal, external, api, database, file
+  source      String   // source identifier
+  connection  Json     // connection configuration
+  schema      Json?    // data schema definition
+  
+  // Data source settings
+  isActive    Boolean  @default(true)
+  refreshInterval Int   @default(3600) // seconds
+  lastSync    DateTime?
+  syncStatus  String   @default("pending") // pending, running, completed, failed
+  
+  // Data quality
+  dataQuality Json?    // data quality metrics
+  validation  Json?    // validation rules
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Warehouse relation
+  warehouseId String?
+  warehouse   DataWarehouse? @relation(fields: [warehouseId], references: [id], onDelete: SetNull)
+  
+  // Relations
+  etlJobs     ETLJob[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("data_sources")
+}
+
+model ETLJob {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  
+  // ETL configuration
+  type        String   // extract, transform, load, full
+  sourceId    String
+  source      DataSource @relation(fields: [sourceId], references: [id], onDelete: Cascade)
+  target      Json     // target configuration
+  transformation Json? // transformation rules
+  
+  // Job settings
+  schedule    String?  // cron expression
+  isActive    Boolean  @default(true)
+  priority    Int      @default(0)
+  
+  // Execution tracking
+  lastRun     DateTime?
+  nextRun     DateTime?
+  status      String   @default("pending") // pending, running, completed, failed
+  duration    Int?     // execution time in seconds
+  recordsProcessed Int @default(0)
+  recordsFailed Int    @default(0)
+  
+  // Error handling
+  errorMessage String?
+  retryCount  Int      @default(0)
+  maxRetries  Int      @default(3)
+  
+  // Warehouse relation
+  warehouseId String
+  warehouse   DataWarehouse @relation(fields: [warehouseId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  executions  ETLExecution[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("etl_jobs")
+}
+
+model ETLExecution {
+  id          String   @id @default(cuid())
+  
+  // Execution details
+  jobId       String
+  job         ETLJob   @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  // Execution tracking
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  status      String   @default("running") // running, completed, failed, cancelled
+  duration    Int?     // execution time in seconds
+  
+  // Performance metrics
+  recordsProcessed Int @default(0)
+  recordsFailed Int    @default(0)
+  dataSize    Int?     // data size in bytes
+  throughput  Float?   // records per second
+  
+  // Error details
+  errorMessage String?
+  errorDetails Json?
+  
+  // Logs
+  logs        Json?    // execution logs
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("etl_executions")
+}
+
+model AnalyticsEngine {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  
+  // Engine configuration
+  type        String   // internal, external, cloud
+  provider    String?  // provider name
+  connection  Json     // connection configuration
+  capabilities Json    // supported capabilities
+  
+  // Engine settings
+  isActive    Boolean  @default(true)
+  maxConcurrentJobs Int @default(5)
+  timeout     Int      @default(3600) // seconds
+  
+  // Performance
+  responseTime Float?  // average response time
+  throughput  Float?   // requests per second
+  errorRate   Float?   // error rate percentage
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  models      MLModel[]
+  predictions UserPrediction[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("analytics_engines")
+}
+
+
+
+model AnalyticsReport {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  
+  // Report configuration
+  type        String   // scheduled, on-demand, automated
+  template    Json     // report template
+  parameters  Json?    // report parameters
+  format      String   @default("pdf") // pdf, excel, csv, json
+  
+  // Report settings
+  isActive    Boolean  @default(true)
+  schedule    String?  // cron expression for scheduled reports
+  recipients  Json     // recipient list
+  deliveryMethod String @default("email") // email, webhook, api
+  
+  // Execution tracking
+  lastGenerated DateTime?
+  nextGeneration DateTime?
+  generationCount Int @default(0)
+  
+  // Performance
+  generationTime Float? // average generation time
+  fileSize     Int?     // generated file size
+  
+  // Dashboard relation
+  dashboardId String
+  dashboard   AnalyticsDashboard @relation(fields: [dashboardId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  executions  ReportExecution[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("analytics_reports")
+}
+
+model ReportExecution {
+  id          String   @id @default(cuid())
+  
+  // Execution details
+  reportId    String
+  report      AnalyticsReport @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  
+  // Execution tracking
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  status      String   @default("running") // running, completed, failed, cancelled
+  duration    Int?     // execution time in seconds
+  
+  // Output details
+  filePath    String?
+  fileSize    Int?
+  format      String
+  url         String?
+  
+  // Delivery tracking
+  deliveredAt DateTime?
+  deliveryStatus String @default("pending") // pending, delivered, failed
+  deliveryError String?
+  
+  // Recipients
+  recipients  Json     // actual recipients
+  openedCount Int      @default(0)
+  clickedCount Int     @default(0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("report_executions")
+}
+
+model CompetitiveIntelligence {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  
+  // Competitor information
+  competitorName String
+  competitorUrl  String?
+  competitorType String  // direct, indirect, potential
+  
+  // Monitoring configuration
+  metrics     Json     // metrics to monitor
+  sources     Json     // data sources
+  frequency   String   @default("daily") // hourly, daily, weekly, monthly
+  
+  // Data collection
+  lastCollected DateTime?
+  dataPoints   Json?    // collected data points
+  trends       Json?    // trend analysis
+  
+  // Analysis
+  marketShare  Float?
+  competitivePosition String? // leader, challenger, follower, niche
+  strengths    Json?    // competitor strengths
+  weaknesses   Json?    // competitor weaknesses
+  opportunities Json?   // market opportunities
+  threats      Json?    // market threats
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("competitive_intelligence")
+}
+
+model MarketData {
+  id          String   @id @default(cuid())
+  
+  // Market information
+  marketName  String
+  marketType  String   // industry, geographic, demographic
+  dataType    String   // trend, size, growth, share
+  
+  // Data values
+  value       Decimal  @db.Decimal(15, 4)
+  currency    Currency @default(USD)
+  unit        String?  // percentage, count, currency, etc.
+  
+  // Time tracking
+  period      String   // daily, weekly, monthly, quarterly, yearly
+  date        DateTime
+  year        Int
+  month       Int?
+  quarter     Int?
+  
+  // Source information
+  source      String   // data source
+  sourceUrl   String?
+  confidence  Float?   // data confidence level
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([siteId, marketName, dataType, date])
+  @@map("market_data")
+}
+
+model BusinessMetric {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  
+  // Metric configuration
+  category    String   // revenue, traffic, engagement, conversion, operational
+  type        String   // kpi, metric, indicator
+  formula     String?  // calculation formula
+  unit        String?  // percentage, currency, count, etc.
+  
+  // Target settings
+  target      Decimal? @db.Decimal(15, 4)
+  threshold   Decimal? @db.Decimal(15, 4)
+  alertEnabled Boolean @default(true)
+  
+  // Current values
+  currentValue Decimal? @db.Decimal(15, 4)
+  previousValue Decimal? @db.Decimal(15, 4)
+  change      Float?   // percentage change
+  trend       String?  // up, down, stable
+  
+  // Time tracking
+  lastUpdated DateTime?
+  updateFrequency String @default("daily") // real-time, hourly, daily, weekly
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  alerts      BusinessAlert[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("business_metrics")
+}
+
+model BusinessAlert {
+  id          String   @id @default(cuid())
+  
+  // Alert configuration
+  metricId    String
+  metric      BusinessMetric @relation(fields: [metricId], references: [id], onDelete: Cascade)
+  
+  // Alert details
+  type        String   // threshold, trend, anomaly
+  severity    String   // low, medium, high, critical
+  condition   String   // above, below, equals, changes
+  value       Decimal  @db.Decimal(15, 4)
+  
+  // Alert status
+  isActive    Boolean  @default(true)
+  isTriggered Boolean  @default(false)
+  triggeredAt DateTime?
+  acknowledgedAt DateTime?
+  resolvedAt  DateTime?
+  
+  // Notification
+  recipients  Json     // alert recipients
+  notificationSent Boolean @default(false)
+  notificationSentAt DateTime?
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("business_alerts")
+}
+
+model PredictiveInsight {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  
+  // Insight configuration
+  type        String   // trend, forecast, anomaly, recommendation
+  category    String   // revenue, traffic, user, content, market
+  confidence  Float    // confidence level 0-1
+  
+  // Insight data
+  prediction  Json     // prediction details
+  factors     Json?    // contributing factors
+  impact      String?  // high, medium, low
+  timeframe   String?  // short-term, medium-term, long-term
+  
+  // Status
+  isActive    Boolean  @default(true)
+  isVerified  Boolean  @default(false)
+  verifiedAt  DateTime?
+  accuracy    Float?   // actual accuracy after verification
+  
+  // Usage
+  usedInDecisions Int @default(0)
+  lastUsed    DateTime?
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("predictive_insights")
+}
+
+// CRM System Models
+
+model Lead {
+  id          String   @id @default(cuid())
+  
+  // Lead information
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  company     String?
+  jobTitle    String?
+  website     String?
+  
+  // Lead scoring and qualification
+  score       Int      @default(0)
+  status      LeadStatus @default(NEW)
+  source      String   // website, referral, social, campaign, etc.
+  sourceDetails Json?  // additional source information
+  
+  // Lead details
+  industry    String?
+  companySize String?  // 1-10, 11-50, 51-200, 201-1000, 1000+
+  budget      String?  // <$10k, $10k-$50k, $50k-$100k, $100k+
+  timeline    String?  // immediate, 1-3 months, 3-6 months, 6+ months
+  
+  // Lead assignment
+  assignedTo  String?
+  assignedUser User?   @relation("LeadAssignment", fields: [assignedTo], references: [id], onDelete: SetNull)
+  
+  // Lead nurturing
+  lastContacted DateTime?
+  nextFollowUp DateTime?
+  nurtureStage String? // awareness, consideration, decision
+  
+  // Conversion tracking
+  convertedAt DateTime?
+  convertedToContactId String?
+  convertedContact Contact? @relation("LeadConversion", fields: [convertedToContactId], references: [id], onDelete: SetNull)
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  interactions Interaction[]
+  tasks       Task[]
+  campaigns   CampaignLead[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("leads")
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  
+  // Contact information
+  firstName   String
+  lastName    String
+  email       String
+  phone       String?
+  mobile      String?
+  
+  // Company information
+  company     String?
+  jobTitle    String?
+  department  String?
+  website     String?
+  
+  // Contact details
+  address     Json?    // structured address data
+  socialMedia Json?    // social media profiles
+  preferences Json?    // communication preferences
+  
+  // Contact scoring and engagement
+  score       Int      @default(0)
+  status      ContactStatus @default(ACTIVE)
+  engagementLevel String @default("LOW") // low, medium, high, very_high
+  
+  // Contact assignment
+  assignedTo  String?
+  assignedUser User?   @relation("ContactAssignment", fields: [assignedTo], references: [id], onDelete: SetNull)
+  
+  // Contact lifecycle
+  lastContacted DateTime?
+  lastEngaged  DateTime?
+  lifetimeValue Decimal? @db.Decimal(15, 2)
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  interactions Interaction[]
+  deals       Deal[]
+  tasks       Task[]
+  campaigns   CampaignContact[]
+  convertedLeads Lead[] @relation("LeadConversion")
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("contacts")
+}
+
+model Deal {
+  id          String   @id @default(cuid())
+  
+  // Deal information
+  name        String
+  description String?
+  value       Decimal  @db.Decimal(15, 2)
+  currency    Currency @default(USD)
+  
+  // Deal stage and pipeline
+  stage       DealStage @default(PROSPECTING)
+  probability Int      @default(10) // percentage
+  expectedCloseDate DateTime?
+  actualCloseDate DateTime?
+  
+  // Deal details
+  type        String?  // new business, upsell, renewal, etc.
+  source      String?  // lead conversion, referral, etc.
+  tags        Json?    // deal tags and categories
+  
+  // Deal assignment
+  assignedTo  String?
+  assignedUser User?   @relation("DealAssignment", fields: [assignedTo], references: [id], onDelete: SetNull)
+  
+  // Deal contacts
+  contactId   String
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  
+  // Deal tracking
+  lastActivity DateTime?
+  nextActivity DateTime?
+  isWon       Boolean  @default(false)
+  isLost      Boolean  @default(false)
+  lostReason  String?
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  interactions Interaction[]
+  tasks       Task[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("deals")
+}
+
+model Interaction {
+  id          String   @id @default(cuid())
+  
+  // Interaction details
+  type        InteractionType
+  subject     String?
+  content     String?  @db.Text
+  duration    Int?     // in minutes
+  
+  // Interaction participants
+  leadId      String?
+  lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  contactId   String?
+  contact     Contact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  dealId      String?
+  deal        Deal?    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  
+  // Interaction metadata
+  direction   String   @default("INBOUND") // inbound, outbound
+  channel     String   // email, phone, meeting, chat, etc.
+  outcome     String?  // positive, negative, neutral
+  
+  // Interaction tracking
+  initiatedBy String?
+  initiatedUser User?  @relation("InteractionInitiated", fields: [initiatedBy], references: [id], onDelete: SetNull)
+  scheduledAt DateTime?
+  completedAt DateTime?
+  
+  // Follow-up
+  requiresFollowUp Boolean @default(false)
+  followUpDate DateTime?
+  followUpNotes String?
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("interactions")
+}
+
+model Campaign {
+  id          String   @id @default(cuid())
+  
+  // Campaign information
+  name        String
+  description String?
+  type        CampaignType
+  status      CampaignStatus @default(DRAFT)
+  
+  // Campaign configuration
+  targetAudience Json? // target audience criteria
+  goals       Json?    // campaign goals and metrics
+  budget      Decimal? @db.Decimal(15, 2)
+  currency    Currency @default(USD)
+  
+  // Campaign timing
+  startDate   DateTime?
+  endDate     DateTime?
+  scheduledAt DateTime?
+  
+  // Campaign content
+  subject     String?
+  content     String?  @db.Text
+  template    String?
+  
+  // Campaign tracking
+  sentCount   Int      @default(0)
+  openedCount Int      @default(0)
+  clickedCount Int     @default(0)
+  convertedCount Int   @default(0)
+  
+  // Campaign assignment
+  createdBy   String
+  createdUser User     @relation("CampaignCreated", fields: [createdBy], references: [id], onDelete: Cascade)
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  leads       CampaignLead[]
+  contacts    CampaignContact[]
+  tasks       Task[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("campaigns")
+}
+
+model CampaignLead {
+  id          String   @id @default(cuid())
+  
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  
+  // Campaign interaction tracking
+  sentAt      DateTime?
+  openedAt    DateTime?
+  clickedAt   DateTime?
+  convertedAt DateTime?
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([campaignId, leadId])
+  @@map("campaign_leads")
+}
+
+model CampaignContact {
+  id          String   @id @default(cuid())
+  
+  campaignId  String
+  campaign    Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  contactId   String
+  contact     Contact  @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  
+  // Campaign interaction tracking
+  sentAt      DateTime?
+  openedAt    DateTime?
+  clickedAt   DateTime?
+  convertedAt DateTime?
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([campaignId, contactId])
+  @@map("campaign_contacts")
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  
+  // Task information
+  title       String
+  description String?
+  type        TaskType
+  priority    TaskPriority @default(MEDIUM)
+  status      TaskStatus @default(PENDING)
+  
+  // Task scheduling
+  dueDate     DateTime?
+  completedAt DateTime?
+  reminderAt  DateTime?
+  
+  // Task assignment
+  assignedTo  String?
+  assignedUser User?   @relation("TaskAssignment", fields: [assignedTo], references: [id], onDelete: SetNull)
+  
+  // Task relationships
+  leadId      String?
+  lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  contactId   String?
+  contact     Contact? @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  dealId      String?
+  deal        Deal?    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  campaignId  String?
+  campaign    Campaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  
+  // Task metadata
+  tags        Json?    // task tags
+  notes       String?  @db.Text
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("tasks")
+}
+
+model Workflow {
+  id          String   @id @default(cuid())
+  
+  // Workflow information
+  name        String
+  description String?
+  type        WorkflowType
+  status      WorkflowStatus @default(ACTIVE)
+  
+  // Workflow configuration
+  triggers    Json     // workflow triggers
+  conditions  Json?    // workflow conditions
+  actions     Json     // workflow actions
+  settings    Json?    // workflow settings
+  
+  // Workflow execution
+  isActive    Boolean  @default(true)
+  lastExecuted DateTime?
+  executionCount Int   @default(0)
+  
+  // Workflow assignment
+  createdBy   String
+  createdUser User     @relation("WorkflowCreated", fields: [createdBy], references: [id], onDelete: Cascade)
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // Relations
+  executions  WorkflowExecution[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("workflows")
+}
+
+model WorkflowExecution {
+  id          String   @id @default(cuid())
+  
+  workflowId  String
+  workflow    Workflow @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  
+  // Execution details
+  status      WorkflowExecutionStatus @default(RUNNING)
+  trigger     String   // what triggered the execution
+  input       Json?    // input data
+  output      Json?    // output data
+  
+  // Execution timing
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  duration    Int?     // execution duration in seconds
+  
+  // Error handling
+  error       String?
+  retryCount  Int      @default(0)
+  
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("workflow_executions")
+}
+
+// CRM Enums
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  PROPOSAL_SENT
+  NEGOTIATION
+  CONVERTED
+  LOST
+  DISQUALIFIED
+}
+
+enum ContactStatus {
+  ACTIVE
+  INACTIVE
+  PROSPECT
+  CUSTOMER
+  PARTNER
+  VENDOR
+}
+
+enum DealStage {
+  PROSPECTING
+  QUALIFICATION
+  PROPOSAL
+  NEGOTIATION
+  CLOSED_WON
+  CLOSED_LOST
+}
+
+enum InteractionType {
+  EMAIL
+  PHONE_CALL
+  MEETING
+  CHAT
+  SOCIAL_MEDIA
+  WEBSITE_VISIT
+  FORM_SUBMISSION
+  OTHER
+}
+
+enum CampaignType {
+  EMAIL
+  SOCIAL_MEDIA
+  CONTENT_MARKETING
+  PAID_ADVERTISING
+  EVENT
+  REFERRAL
+  OTHER
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskType {
+  CALL
+  EMAIL
+  MEETING
+  FOLLOW_UP
+  RESEARCH
+  PROPOSAL
+  PRESENTATION
+  OTHER
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  DEFERRED
+}
+
+enum WorkflowType {
+  LEAD_NURTURING
+  FOLLOW_UP
+  TASK_ASSIGNMENT
+  NOTIFICATION
+  DATA_ENRICHMENT
+  CUSTOM
+}
+
+
+
+enum WorkflowExecutionStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+  RETRYING
+}
+
+// Community and Engagement Models
+
+model Forum {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  slug        String   @unique
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Site relation
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  // Relations
+  categories  ForumCategory[]
+  threads     ForumThread[]
+  moderators  ForumModerator[]
+
+  @@map("forums")
+}
+
+model ForumCategory {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  slug        String   @unique
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  forumId     String
+  forum       Forum    @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      ForumCategory? @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children    ForumCategory[] @relation("CategoryHierarchy")
+  threads     ForumThread[]
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("forum_categories")
+}
+
+model ForumThread {
+  id          String   @id @default(cuid())
+  title       String
+  content     String   @db.Text
+  isSticky    Boolean  @default(false)
+  isLocked    Boolean  @default(false)
+  viewCount   Int      @default(0)
+  replyCount  Int      @default(0)
+  lastReplyAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  categoryId  String
+  category    ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  posts       ForumPost[]
+  forumId     String
+  forum       Forum    @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("forum_threads")
+}
+
+model ForumPost {
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  isSolution  Boolean  @default(false)
+  isEdited    Boolean  @default(false)
+  editedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  threadId    String
+  thread      ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      ForumPost? @relation("PostReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies     ForumPost[] @relation("PostReplies")
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("forum_posts")
+}
+
+model ForumModerator {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relations
+  forumId   String
+  forum     Forum    @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([forumId, userId])
+  @@map("forum_moderators")
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  isApproved  Boolean  @default(false)
+  isEdited    Boolean  @default(false)
+  editedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  articleId   String?
+  article     Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parentId    String?
+  parent      Comment? @relation("CommentReplies", fields: [parentId], references: [id], onDelete: SetNull)
+  replies     Comment[] @relation("CommentReplies")
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("comments")
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  type        EventType
+  status      EventStatus @default(DRAFT)
+  startDate   DateTime
+  endDate     DateTime
+  timezone    String   @default("UTC")
+  maxAttendees Int?
+  currentAttendees Int @default(0)
+  isPublic    Boolean  @default(true)
+  registrationRequired Boolean @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  organizerId String
+  organizer   User     @relation(fields: [organizerId], references: [id], onDelete: Cascade)
+  attendees   EventAttendee[]
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("events")
+}
+
+model EventAttendee {
+  id        String   @id @default(cuid())
+  status    EventAttendeeStatus @default(REGISTERED)
+  createdAt DateTime @default(now())
+
+  // Relations
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  siteId    String
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([eventId, userId])
+  @@map("event_attendees")
+}
+
+model Community {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  slug        String   @unique
+  type        CommunityType
+  isPrivate   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  memberCount Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creatorId   String
+  creator     User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  members     CommunityMember[]
+  moderators  CommunityModerator[]
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("communities")
+}
+
+model CommunityMember {
+  id        String   @id @default(cuid())
+  role      CommunityRole @default(MEMBER)
+  joinedAt  DateTime @default(now())
+
+  // Relations
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+  @@map("community_members")
+}
+
+model CommunityModerator {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relations
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+  @@map("community_moderators")
+}
+
+model CommunityUserProfile {
+  id              String   @id @default(cuid())
+  bio             String?  @db.Text
+  avatar          String?
+  location        String?
+  website         String?
+  socialLinks     Json?
+  reputation      Int      @default(0)
+  points          Int      @default(0)
+  level           Int      @default(1)
+  badges          Json?
+  achievements    Json?
+  preferences     Json?
+  privacySettings Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  followers       UserFollow[] @relation("UserFollowers")
+  following       UserFollow[] @relation("UserFollowing")
+  activities      UserActivity[]
+  siteId          String
+  site            Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("community_user_profiles")
+}
+
+model UserFollow {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  // Relations
+  followerId String
+  follower   CommunityUserProfile @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  followingId String
+  following  CommunityUserProfile @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+  siteId     String
+  site       Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@map("user_follows")
+}
+
+model UserActivity {
+  id          String   @id @default(cuid())
+  type        ActivityType
+  title       String
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  communityUserProfiles CommunityUserProfile[]
+
+  @@map("user_activities")
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  icon        String?
+  points      Int      @default(0)
+  criteria    Json?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id        String   @id @default(cuid())
+  earnedAt  DateTime @default(now())
+
+  // Relations
+  achievementId String
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  siteId        String
+  site          Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([achievementId, userId])
+  @@map("user_achievements")
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  type        ReportType
+  reason      String
+  description String?
+  status      ReportStatus @default(OPEN)
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  reporterId  String
+  reporter    User     @relation(fields: [reporterId], references: [id], onDelete: Cascade)
+  reportedUserId String?
+  reportedUser User?   @relation("ReportedUser", fields: [reportedUserId], references: [id], onDelete: SetNull)
+  contentId   String?
+  contentType String?
+  moderatorId String?
+  moderator   User?    @relation("ReportModerator", fields: [moderatorId], references: [id], onDelete: SetNull)
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+// Community Enums
+
+enum EventType {
+  WEBINAR
+  LIVE_STREAM
+  CONFERENCE
+  WORKSHOP
+  MEETUP
+  OTHER
+}
+
+enum EventStatus {
+  DRAFT
+  SCHEDULED
+  LIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum EventAttendeeStatus {
+  REGISTERED
+  ATTENDED
+  NO_SHOW
+  CANCELLED
+}
+
+enum CommunityType {
+  PUBLIC
+  PRIVATE
+  INVITE_ONLY
+  MODERATED
+}
+
+enum CommunityRole {
+  MEMBER
+  MODERATOR
+  ADMIN
+  OWNER
+}
+
+enum ActivityType {
+  POST_CREATED
+  COMMENT_ADDED
+  THREAD_STARTED
+  EVENT_ATTENDED
+  ACHIEVEMENT_EARNED
+  PROFILE_UPDATED
+  FOLLOWED_USER
+  JOINED_COMMUNITY
+}
+
+enum ReportType {
+  SPAM
+  INAPPROPRIATE
+  HARASSMENT
+  COPYRIGHT
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  DISMISSED
+}
+
+// Marketing and Growth Models
+
+model MarketingCampaign {
+  id          String   @id @default(cuid())
+  name        String
+  description String?  @db.Text
+  type        MarketingCampaignType
+  status      MarketingCampaignStatus @default(DRAFT)
+  startDate   DateTime?
+  endDate     DateTime?
+  budget      Decimal? @db.Decimal(10, 2)
+  spent       Decimal  @db.Decimal(10, 2) @default(0)
+  targetAudience Json?
+  channels    Json     // array of marketing channels
+  goals       Json?    // campaign goals and KPIs
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  createdBy   String
+  createdUser User     @relation("MarketingCampaignCreated", fields: [createdBy], references: [id], onDelete: Cascade)
+  leads       MarketingLead[]
+  emails      EmailCampaign[]
+  socialPosts SocialMediaPost[]
+  abTests     MarketingABTest[]
+  analytics   MarketingAnalytics[]
+
+  @@map("marketing_campaigns")
+}
+
+model MarketingLead {
+  id          String   @id @default(cuid())
+  email       String
+  firstName   String?
+  lastName    String?
+  company     String?
+  jobTitle    String?
+  phone       String?
+  source      String   // form, social, email, etc.
+  score       Int      @default(0)
+  status      MarketingLeadStatus @default(NEW)
+  tags        Json?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  campaignId  String?
+  campaign    MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  automations MarketingAutomation[]
+  activities  MarketingLeadActivity[]
+
+  @@map("marketing_leads")
+}
+
+model MarketingAutomation {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        MarketingAutomationType
+  status      MarketingAutomationStatus @default(DRAFT)
+  triggers    Json     // automation triggers
+  actions     Json     // automation actions
+  conditions  Json?    // automation conditions
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  createdBy   String
+  createdUser User     @relation("MarketingAutomationCreated", fields: [createdBy], references: [id], onDelete: Cascade)
+  leads       MarketingLead[]
+  executions  MarketingAutomationExecution[]
+
+  @@map("marketing_automations")
+}
+
+model MarketingAutomationExecution {
+  id          String   @id @default(cuid())
+  status      MarketingAutomationExecutionStatus @default(RUNNING)
+  trigger     String
+  input       Json?
+  output      Json?
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+  error       String?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  automationId String
+  automation   MarketingAutomation @relation(fields: [automationId], references: [id], onDelete: Cascade)
+  siteId       String
+  site         Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("marketing_automation_executions")
+}
+
+model SocialMediaPost {
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  platform    SocialMediaPlatform
+  status      SocialMediaPostStatus @default(DRAFT)
+  scheduledAt DateTime?
+  publishedAt DateTime?
+  postId      String?  // external post ID
+  url         String?
+  engagement  Json?    // likes, shares, comments, etc.
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  campaignId  String?
+  campaign    MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  createdBy   String
+  createdUser User     @relation("SocialMediaPostCreated", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@map("social_media_posts")
+}
+
+model EmailCampaign {
+  id          String   @id @default(cuid())
+  name        String
+  subject     String
+  content     String   @db.Text
+  template    String?
+  status      EmailCampaignStatus @default(DRAFT)
+  scheduledAt DateTime?
+  sentAt      DateTime?
+  recipientCount Int   @default(0)
+  openCount   Int      @default(0)
+  clickCount  Int      @default(0)
+  bounceCount Int      @default(0)
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  campaignId  String?
+  campaign    MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  createdBy   String
+  createdUser User     @relation("EmailCampaignCreated", fields: [createdBy], references: [id], onDelete: Cascade)
+  recipients  EmailCampaignRecipient[]
+
+  @@map("email_campaigns")
+}
+
+model EmailCampaignRecipient {
+  id        String   @id @default(cuid())
+  email     String
+  status    EmailRecipientStatus @default(PENDING)
+  sentAt    DateTime?
+  openedAt  DateTime?
+  clickedAt DateTime?
+  bouncedAt DateTime?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  // Relations
+  campaignId String
+  campaign   EmailCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  siteId     String
+  site       Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([campaignId, email])
+  @@map("email_campaign_recipients")
+}
+
+model MarketingAnalytics {
+  id          String   @id @default(cuid())
+  type        MarketingAnalyticsType
+  metric      String
+  value       Decimal  @db.Decimal(15, 4)
+  date        DateTime
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  campaignId  String?
+  campaign    MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+
+  @@unique([siteId, type, metric, date])
+  @@map("marketing_analytics")
+}
+
+model MarketingABTest {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  type        MarketingABTestType
+  status      MarketingABTestStatus @default(DRAFT)
+  startDate   DateTime?
+  endDate     DateTime?
+  variants    Json     // test variants
+  results     Json?    // test results
+  winner      String?  // winning variant
+  confidence  Float?   // statistical confidence
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  campaignId  String?
+  campaign    MarketingCampaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  createdBy   String
+  createdUser User     @relation("MarketingABTestCreated", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@map("marketing_ab_tests")
+}
+
+model MarketingLeadActivity {
+  id          String   @id @default(cuid())
+  type        MarketingLeadActivityType
+  description String?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+
+  // Relations
+  leadId      String
+  lead        MarketingLead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@map("marketing_lead_activities")
+}
+
+model Influencer {
+  id          String   @id @default(cuid())
+  name        String
+  email       String?
+  platform    String
+  handle      String
+  followers   Int      @default(0)
+  engagement  Float    @default(0)
+  score       Int      @default(0)
+  status      InfluencerStatus @default(ACTIVE)
+  tags        Json?
+  metadata    Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  campaigns   InfluencerCampaign[]
+
+  @@map("influencers")
+}
+
+model InfluencerCampaign {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  status      InfluencerCampaignStatus @default(DRAFT)
+  startDate   DateTime?
+  endDate     DateTime?
+  budget      Decimal? @db.Decimal(10, 2)
+  results     Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  influencerId String
+  influencer  Influencer @relation(fields: [influencerId], references: [id], onDelete: Cascade)
+  createdBy   String
+  createdUser User     @relation("InfluencerCampaignCreated", fields: [createdBy], references: [id], onDelete: Cascade)
+
+  @@map("influencer_campaigns")
+}
+
+model SEOKeyword {
+  id          String   @id @default(cuid())
+  keyword     String
+  searchVolume Int     @default(0)
+  difficulty  Int      @default(0)
+  cpc         Decimal? @db.Decimal(10, 2)
+  position    Int?
+  url         String?
+  status      SEOKeywordStatus @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, keyword])
+  @@map("seo_keywords")
+}
+
+model SEOCompetitor {
+  id          String   @id @default(cuid())
+  domain      String
+  name        String?
+  metrics     Json?    // competitor metrics
+  keywords    Json?    // shared keywords
+  status      SEOCompetitorStatus @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  siteId      String
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@unique([siteId, domain])
+  @@map("seo_competitors")
+}
+
+// Marketing Enums
+
+enum MarketingCampaignType {
+  SOCIAL_MEDIA
+  EMAIL
+  CONTENT
+  PAID_ADVERTISING
+  INFLUENCER
+  SEO
+  MULTI_CHANNEL
+  OTHER
+}
+
+enum MarketingCampaignStatus {
+  DRAFT
+  SCHEDULED
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum MarketingLeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+  UNSUBSCRIBED
+}
+
+enum MarketingAutomationType {
+  LEAD_NURTURING
+  EMAIL_SEQUENCE
+  SOCIAL_MEDIA
+  CONTENT_DISTRIBUTION
+  LEAD_SCORING
+  CUSTOM
+}
+
+enum MarketingAutomationStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum MarketingAutomationExecutionStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum SocialMediaPlatform {
+  TWITTER
+  LINKEDIN
+  FACEBOOK
+  INSTAGRAM
+  YOUTUBE
+  TIKTOK
+  OTHER
+}
+
+enum SocialMediaPostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+  FAILED
+  CANCELLED
+}
+
+enum EmailCampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENDING
+  SENT
+  CANCELLED
+}
+
+enum EmailRecipientStatus {
+  PENDING
+  SENT
+  DELIVERED
+  OPENED
+  CLICKED
+  BOUNCED
+  UNSUBSCRIBED
+}
+
+enum MarketingAnalyticsType {
+  CAMPAIGN
+  LEAD
+  EMAIL
+  SOCIAL_MEDIA
+  WEBSITE
+  CONVERSION
+  ROI
+}
+
+enum MarketingABTestType {
+  EMAIL_SUBJECT
+  EMAIL_CONTENT
+  LANDING_PAGE
+  AD_CREATIVE
+  SOCIAL_POST
+  OTHER
+}
+
+enum MarketingABTestStatus {
+  DRAFT
+  RUNNING
+  COMPLETED
+  CANCELLED
+}
+
+enum MarketingLeadActivityType {
+  FORM_SUBMISSION
+  EMAIL_OPEN
+  EMAIL_CLICK
+  WEBSITE_VISIT
+  SOCIAL_ENGAGEMENT
+  PHONE_CALL
+  MEETING
+  OTHER
+}
+
+enum InfluencerStatus {
+  ACTIVE
+  INACTIVE
+  BLACKLISTED
+}
+
+enum InfluencerCampaignStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum SEOKeywordStatus {
+  ACTIVE
+  INACTIVE
+  TARGETED
+}
+
+enum SEOCompetitorStatus {
+  ACTIVE
+  INACTIVE
+}
+
+// ================================
+// ENHANCED SECURITY & COMPLIANCE MODELS
+// ================================
+
+// Compliance Record Model for regulatory compliance
+model ComplianceRecord {
+  id           String              @id @default(cuid())
+  siteId       String
+  userId       String?
+  regulation   ComplianceType
+  status       ComplianceStatus
+  requirement  String
+  description  String
+  evidence     Json                @default("{}")
+  
+  // Assessment details
+  assessedBy   String?
+  assessedAt   DateTime?
+  nextReview   DateTime
+  riskLevel    RiskLevel
+  
+  // Remediation
+  findings     Json                @default("[]")
+  remediation  Json                @default("[]")
+  remediatedBy String?
+  remediatedAt DateTime?
+  
+  // Audit trail
+  auditTrail   Json                @default("[]")
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  // Relations
+  site         Site               @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user         User?              @relation(fields: [userId], references: [id])
+  assessor     User?              @relation("ComplianceAssessor", fields: [assessedBy], references: [id])
+  remediator   User?              @relation("ComplianceRemediator", fields: [remediatedBy], references: [id])
+
+  @@index([siteId])
+  @@index([regulation])
+  @@index([status])
+  @@index([nextReview])
+  @@index([riskLevel])
+}
+
+// Vulnerability Scan Model for security scanning
+model VulnerabilityScan {
+  id              String                   @id @default(cuid())
+  siteId          String
+  scanType        VulnerabilityScanType
+  status          ScanStatus
+  target          String                   // URL, IP, service, etc.
+  scanner         String                   // Tool used for scanning
+  version         String?                  // Scanner version
+  
+  // Scan configuration
+  configuration   Json                     @default("{}")
+  scheduledBy     String?
+  scheduledAt     DateTime?
+  
+  // Scan execution
+  startedAt       DateTime?
+  completedAt     DateTime?
+  duration        Int?                     // Duration in seconds
+  
+  // Results
+  totalVulns      Int                      @default(0)
+  criticalVulns   Int                      @default(0)
+  highVulns       Int                      @default(0)
+  mediumVulns     Int                      @default(0)
+  lowVulns        Int                      @default(0)
+  infoVulns       Int                      @default(0)
+  
+  // Detailed results
+  results         Json                     @default("[]")
+  rawOutput       String?
+  reportUrl       String?
+  
+  // Follow-up
+  reviewed        Boolean                  @default(false)
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  
+  createdAt       DateTime                 @default(now())
+  updatedAt       DateTime                 @updatedAt
+
+  // Relations
+  site            Site                     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  scheduler       User?                    @relation("ScanScheduler", fields: [scheduledBy], references: [id])
+  reviewer        User?                    @relation("ScanReviewer", fields: [reviewedBy], references: [id])
+  vulnerabilities Vulnerability[]
+
+  @@index([siteId])
+  @@index([scanType])
+  @@index([status])
+  @@index([scheduledAt])
+  @@index([criticalVulns])
+  @@index([highVulns])
+}
+
+// Individual Vulnerability Details
+model Vulnerability {
+  id              String                  @id @default(cuid())
+  scanId          String
+  siteId          String
+  cveId           String?                 // CVE identifier if applicable
+  title           String
+  description     String
+  severity        VulnerabilitySeverity
+  cvssScore       Float?
+  cvssVector      String?
+  
+  // Location details
+  component       String?                 // Affected component
+  version         String?                 // Component version
+  location        String?                 // URL, file path, etc.
+  
+  // Classification
+  category        VulnerabilityCategory
+  cweId          String?                 // CWE identifier
+  owasp          String?                 // OWASP category
+  
+  // Remediation
+  remediation     String?
+  references      Json                    @default("[]")
+  patch          String?
+  workaround     String?
+  
+  // Status tracking
+  status         VulnerabilityStatus
+  assignedTo     String?
+  discoveredAt   DateTime                @default(now())
+  reportedAt     DateTime?
+  fixedAt        DateTime?
+  verifiedAt     DateTime?
+  
+  // Risk assessment
+  exploitability Float?                 // 0-10 scale
+  impact         Float?                 // 0-10 scale
+  riskScore      Float?                 // Calculated risk
+  
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @updatedAt
+
+  // Relations
+  scan           VulnerabilityScan      @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  site           Site                   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  assignee       User?                  @relation("VulnerabilityAssignee", fields: [assignedTo], references: [id])
+
+  @@index([siteId])
+  @@index([severity])
+  @@index([status])
+  @@index([cveId])
+  @@index([discoveredAt])
+}
+
+// Security Policy Model for security policies
+model SecurityPolicy {
+  id              String                @id @default(cuid())
+  siteId          String
+  name            String
+  description     String
+  type            SecurityPolicyType
+  category        PolicyCategory
+  priority        PolicyPriority
+  
+  // Policy definition
+  policy          Json                  // Policy rules and conditions
+  enforcement     PolicyEnforcement
+  scope           Json                  @default("[]") // What the policy applies to
+  
+  // Lifecycle
+  status          PolicyStatus
+  version         String                @default("1.0")
+  effectiveDate   DateTime
+  expiryDate      DateTime?
+  
+  // Ownership
+  ownerId         String
+  approvedBy      String?
+  approvedAt      DateTime?
+  
+  // Compliance
+  regulations     Json                  @default("[]") // GDPR, CCPA, etc.
+  controls        Json                  @default("[]") // Security controls
+  
+  // Monitoring
+  violations      Int                   @default(0)
+  lastViolation   DateTime?
+  
+  // Review cycle
+  reviewCycle     Int?                  // Days between reviews
+  nextReview      DateTime?
+  lastReviewed    DateTime?
+  reviewedBy      String?
+  
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+
+  // Relations
+  site            Site                  @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  owner           User                  @relation("PolicyOwner", fields: [ownerId], references: [id])
+  approver        User?                 @relation("PolicyApprover", fields: [approvedBy], references: [id])
+  reviewer        User?                 @relation("PolicyReviewer", fields: [reviewedBy], references: [id])
+  policyViolations PolicyViolation[]
+
+  @@index([siteId])
+  @@index([type])
+  @@index([status])
+  @@index([effectiveDate])
+  @@index([nextReview])
+}
+
+// Policy Violation Tracking
+model PolicyViolation {
+  id            String          @id @default(cuid())
+  policyId      String
+  siteId        String
+  userId        String?
+  
+  // Violation details
+  description   String
+  severity      ViolationSeverity
+  context       Json            @default("{}")
+  evidence      Json            @default("[]")
+  
+  // Detection
+  detectedBy    String?         // System or user
+  detectedAt    DateTime        @default(now())
+  source        String?         // Where violation was detected
+  
+  // Resolution
+  status        ViolationStatus
+  resolvedBy    String?
+  resolvedAt    DateTime?
+  resolution    String?
+  
+  // Impact
+  impact        Json            @default("{}")
+  riskScore     Float?
+  
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  // Relations
+  policy        SecurityPolicy  @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  site          Site           @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user          User?          @relation(fields: [userId], references: [id])
+  detector      User?          @relation("ViolationDetector", fields: [detectedBy], references: [id])
+  resolver      User?          @relation("ViolationResolver", fields: [resolvedBy], references: [id])
+
+  @@index([policyId])
+  @@index([siteId])
+  @@index([severity])
+  @@index([status])
+  @@index([detectedAt])
+}
+
+// Audit Log Model for comprehensive audit trails
+model AuditLog {
+  id            String          @id @default(cuid())
+  siteId        String
+  userId        String?
+  
+  // Event details
+  action        AuditAction
+  resource      String          // What was acted upon
+  resourceId    String?         // ID of the resource
+  resourceType  String          // Type of resource
+  
+  // Context
+  description   String
+  details       Json            @default("{}")
+  metadata      Json            @default("{}")
+  
+  // Request information
+  method        String?         // HTTP method
+  endpoint      String?         // API endpoint
+  ipAddress     String?
+  userAgent     String?
+  sessionId     String?
+  
+  // Result
+  status        AuditStatus
+  errorMessage  String?
+  
+  // Data changes
+  oldValues     Json?           // Previous values
+  newValues     Json?           // New values
+  
+  // Risk and compliance
+  riskLevel     RiskLevel       @default(LOW)
+  compliance    Json            @default("[]") // Compliance requirements affected
+  
+  timestamp     DateTime        @default(now())
+  createdAt     DateTime        @default(now())
+
+  // Relations
+  site          Site           @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user          User?          @relation(fields: [userId], references: [id])
+
+  @@index([siteId])
+  @@index([userId])
+  @@index([action])
+  @@index([resourceType])
+  @@index([timestamp])
+  @@index([riskLevel])
+}
+
+// Encryption Key Model for key management
+model EncryptionKey {
+  id            String               @id @default(cuid())
+  siteId        String
+  keyId         String               @unique // External key ID
+  name          String
+  description   String?
+  
+  // Key properties
+  algorithm     EncryptionAlgorithm
+  keySize       Int
+  purpose       KeyPurpose
+  status        KeyStatus
+  
+  // Key lifecycle
+  generatedAt   DateTime             @default(now())
+  activatedAt   DateTime?
+  rotatedAt     DateTime?
+  retiredAt     DateTime?
+  expiresAt     DateTime?
+  
+  // Rotation
+  rotationCycle Int?                 // Days between rotations
+  nextRotation  DateTime?
+  autoRotate    Boolean              @default(false)
+  
+  // Usage tracking
+  usageCount    Int                  @default(0)
+  lastUsed      DateTime?
+  
+  // Backup and recovery
+  backupKey     String?              // Encrypted backup key reference
+  recoveryKey   String?              // Recovery key reference
+  
+  // Compliance
+  compliance    Json                 @default("[]")
+  
+  // Metadata
+  metadata      Json                 @default("{}")
+  tags          Json                 @default("[]")
+  
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  // Relations
+  site          Site                @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  keyUsage      KeyUsageLog[]
+
+  @@index([siteId])
+  @@index([keyId])
+  @@index([status])
+  @@index([purpose])
+  @@index([nextRotation])
+}
+
+// Key Usage Logging
+model KeyUsageLog {
+  id            String          @id @default(cuid())
+  keyId         String
+  siteId        String
+  userId        String?
+  
+  // Usage details
+  operation     KeyOperation
+  context       String?         // What operation was performed
+  success       Boolean         @default(true)
+  errorMessage  String?
+  
+  // Request information
+  ipAddress     String?
+  userAgent     String?
+  sessionId     String?
+  
+  // Metadata
+  metadata      Json            @default("{}")
+  
+  timestamp     DateTime        @default(now())
+  createdAt     DateTime        @default(now())
+
+  // Relations
+  key           EncryptionKey   @relation(fields: [keyId], references: [id], onDelete: Cascade)
+  site          Site           @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user          User?          @relation(fields: [userId], references: [id])
+
+  @@index([keyId])
+  @@index([siteId])
+  @@index([operation])
+  @@index([timestamp])
+}
+
+// Security Incident Model for incident tracking
+model SecurityIncident {
+  id              String                  @id @default(cuid())
+  siteId          String
+  incidentNumber  String                  @unique // Human-readable incident number
+  
+  // Basic details
+  title           String
+  description     String
+  severity        IncidentSeverity
+  priority        IncidentPriority
+  category        IncidentCategory
+  
+  // Classification
+  type            IncidentType
+  source          IncidentSource
+  vector          AttackVector?
+  
+  // Timeline
+  detectedAt      DateTime
+  reportedAt      DateTime                @default(now())
+  acknowledgedAt  DateTime?
+  resolvedAt      DateTime?
+  closedAt        DateTime?
+  
+  // Assignment
+  assignedTo      String?
+  reportedBy      String
+  
+  // Status tracking
+  status          IncidentStatus
+  stage           IncidentStage
+  
+  // Impact assessment
+  impact          IncidentImpact
+  affectedSystems Json                    @default("[]")
+  affectedUsers   Int?
+  dataCompromised Boolean                 @default(false)
+  estimatedLoss   Float?
+  
+  // Response
+  responseTeam    Json                    @default("[]") // Team member IDs
+  actions         Json                    @default("[]") // Response actions
+  containment     Json                    @default("{}")
+  eradication     Json                    @default("{}")
+  recovery        Json                    @default("{}")
+  
+  // Communication
+  notifications   Json                    @default("[]") // Who was notified
+  external        Boolean                 @default(false) // External notification required
+  regulatory      Boolean                 @default(false) // Regulatory reporting required
+  
+  // Lessons learned
+  rootCause       String?
+  lessonsLearned  String?
+  improvements    Json                    @default("[]")
+  
+  // Follow-up
+  followUpTasks   Json                    @default("[]")
+  nextReview      DateTime?
+  
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+
+  // Relations
+  site            Site                   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  assignee        User?                  @relation("IncidentAssignee", fields: [assignedTo], references: [id])
+  reporter        User                   @relation("IncidentReporter", fields: [reportedBy], references: [id])
+  timeline        IncidentTimeline[]
+
+  @@index([siteId])
+  @@index([incidentNumber])
+  @@index([severity])
+  @@index([status])
+  @@index([detectedAt])
+  @@index([category])
+}
+
+// Incident Timeline for detailed tracking
+model IncidentTimeline {
+  id          String          @id @default(cuid())
+  incidentId  String
+  siteId      String
+  userId      String?
+  
+  // Timeline entry
+  action      String
+  description String
+  category    TimelineCategory
+  
+  // Details
+  details     Json            @default("{}")
+  attachments Json            @default("[]")
+  
+  // Timing
+  timestamp   DateTime        @default(now())
+  duration    Int?            // Duration in minutes
+  
+  createdAt   DateTime        @default(now())
+
+  // Relations
+  incident    SecurityIncident @relation(fields: [incidentId], references: [id], onDelete: Cascade)
+  site        Site            @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  user        User?           @relation(fields: [userId], references: [id])
+
+  @@index([incidentId])
+  @@index([timestamp])
+  @@index([category])
+}
+
+// Enhanced User Security Profile
+model UserSecurityProfile {
+  id                  String              @id @default(cuid())
+  userId              String              @unique
+  siteId              String
+  
+  // Authentication
+  mfaEnabled          Boolean             @default(false)
+  mfaMethod           MFAMethod?
+  mfaBackupCodes      Json                @default("[]")
+  lastMFAVerification DateTime?
+  
+  // Password security
+  passwordChangedAt   DateTime?
+  passwordExpiresAt   DateTime?
+  failedLoginAttempts Int                 @default(0)
+  lockedUntil         DateTime?
+  lastPasswordReset   DateTime?
+  
+  // Session management
+  maxSessions         Int                 @default(5)
+  activeSessions      Int                 @default(0)
+  lastLoginAt         DateTime?
+  lastLoginIP         String?
+  lastLoginLocation   Json?
+  
+  // Security preferences
+  securityNotifications Boolean           @default(true)
+  suspiciousActivity  Boolean             @default(true)
+  dataExportRequest   Boolean             @default(true)
+  
+  // Risk assessment
+  riskScore           Float               @default(0)
+  riskFactors         Json                @default("[]")
+  lastRiskAssessment  DateTime?
+  
+  // Privacy settings
+  dataRetention       Int?                // Days
+  consentGiven        Boolean             @default(false)
+  consentDate         DateTime?
+  dataProcessingConsent Json              @default("{}")
+  
+  // Security events
+  lastSecurityEvent   DateTime?
+  securityEventCount  Int                 @default(0)
+  
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  // Relations
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  site                Site               @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  sessions            UserSecuritySession[]
+
+  @@index([userId])
+  @@index([siteId])
+  @@index([riskScore])
+  @@index([lastLoginAt])
+}
+
+// User Security Session Tracking
+model UserSecuritySession {
+  id              String               @id @default(cuid())
+  profileId       String
+  sessionId       String               @unique
+  siteId          String
+  
+  // Session details
+  ipAddress       String
+  userAgent       String
+  location        Json?
+  deviceFingerprint String?
+  
+  // Timing
+  createdAt       DateTime             @default(now())
+  lastActivity    DateTime             @default(now())
+  expiresAt       DateTime
+  
+  // Status
+  active          Boolean              @default(true)
+  terminated      Boolean              @default(false)
+  terminatedBy    String?              // User ID who terminated
+  terminatedReason String?
+  
+  // Security
+  suspicious      Boolean              @default(false)
+  suspicionReasons Json                @default("[]")
+  verified        Boolean              @default(false)
+  
+  updatedAt       DateTime             @updatedAt
+
+  // Relations
+  profile         UserSecurityProfile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  site            Site                @relation(fields: [siteId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([sessionId])
+  @@index([active])
+  @@index([lastActivity])
+  @@index([suspicious])
+}
+
+// Enhanced Security Enums
+
+enum SecuritySeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFO
+}
+
+enum ComplianceType {
+  GDPR
+  CCPA
+  HIPAA
+  SOX
+  PCI_DSS
+  ISO27001
+  SOC2
+  NIST
+  CUSTOM
+}
+
+enum ComplianceStatus {
+  COMPLIANT
+  NON_COMPLIANT
+  PARTIAL
+  PENDING_REVIEW
+  IN_PROGRESS
+  NOT_APPLICABLE
+}
+
+enum RiskLevel {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  NEGLIGIBLE
+}
+
+enum VulnerabilityScanType {
+  NETWORK
+  WEB_APPLICATION
+  MOBILE_APPLICATION
+  INFRASTRUCTURE
+  CONTAINER
+  DEPENDENCY
+  CONFIGURATION
+  COMPLIANCE
+  PENETRATION_TEST
+  CODE_ANALYSIS
+}
+
+enum ScanStatus {
+  SCHEDULED
+  RUNNING
+  COMPLETED
+  FAILED
+  CANCELLED
+  PAUSED
+}
+
+enum VulnerabilitySeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFORMATIONAL
+}
+
+enum VulnerabilityCategory {
+  INJECTION
+  BROKEN_AUTH
+  SENSITIVE_DATA
+  XML_EXTERNAL
+  BROKEN_ACCESS
+  SECURITY_MISCONFIG
+  XSS
+  DESERIALIZATION
+  VULNERABLE_COMPONENTS
+  LOGGING_MONITORING
+  SSRF
+  OTHER
+}
+
+enum VulnerabilityStatus {
+  OPEN
+  IN_PROGRESS
+  FIXED
+  ACCEPTED_RISK
+  FALSE_POSITIVE
+  DUPLICATE
+  DEFERRED
+}
+
+enum SecurityPolicyType {
+  ACCESS_CONTROL
+  DATA_PROTECTION
+  AUTHENTICATION
+  ENCRYPTION
+  INCIDENT_RESPONSE
+  VULNERABILITY_MANAGEMENT
+  COMPLIANCE
+  PRIVACY
+  ACCEPTABLE_USE
+  NETWORK_SECURITY
+  APPLICATION_SECURITY
+  PHYSICAL_SECURITY
+  BUSINESS_CONTINUITY
+  CUSTOM
+}
+
+enum PolicyCategory {
+  TECHNICAL
+  ADMINISTRATIVE
+  PHYSICAL
+  LEGAL
+  OPERATIONAL
+}
+
+enum PolicyPriority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum PolicyEnforcement {
+  STRICT
+  MODERATE
+  ADVISORY
+  MONITORING_ONLY
+}
+
+enum PolicyStatus {
+  DRAFT
+  UNDER_REVIEW
+  APPROVED
+  ACTIVE
+  INACTIVE
+  EXPIRED
+  RETIRED
+}
+
+enum ViolationSeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum ViolationStatus {
+  OPEN
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+  ESCALATED
+}
+
+enum AuditAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+  IMPORT
+  APPROVE
+  REJECT
+  ACTIVATE
+  DEACTIVATE
+  CONFIGURE
+  INSTALL
+  UNINSTALL
+  BACKUP
+  RESTORE
+  ENCRYPT
+  DECRYPT
+  GRANT_ACCESS
+  REVOKE_ACCESS
+  ESCALATE_PRIVILEGE
+  OTHER
+}
+
+enum AuditStatus {
+  SUCCESS
+  FAILURE
+  WARNING
+  PENDING
+}
+
+enum EncryptionAlgorithm {
+  AES_256
+  AES_128
+  RSA_2048
+  RSA_4096
+  ECC_P256
+  ECC_P384
+  CHACHA20
+  OTHER
+}
+
+enum KeyPurpose {
+  ENCRYPTION
+  DECRYPTION
+  SIGNING
+  VERIFICATION
+  KEY_EXCHANGE
+  AUTHENTICATION
+  BACKUP
+  RECOVERY
+  OTHER
+}
+
+enum KeyStatus {
+  ACTIVE
+  INACTIVE
+  PENDING_ACTIVATION
+  EXPIRED
+  COMPROMISED
+  RETIRED
+  DESTROYED
+}
+
+enum KeyOperation {
+  GENERATE
+  ACTIVATE
+  USE
+  ROTATE
+  BACKUP
+  RESTORE
+  RETIRE
+  DESTROY
+  EXPORT
+  IMPORT
+}
+
+enum IncidentSeverity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum IncidentPriority {
+  P1_CRITICAL
+  P2_HIGH
+  P3_MEDIUM
+  P4_LOW
+}
+
+enum IncidentCategory {
+  MALWARE
+  PHISHING
+  WEB_ATTACK
+  BRUTE_FORCE
+  DENIAL_OF_SERVICE
+  DATA_BREACH
+  INSIDER_THREAT
+  SOCIAL_ENGINEERING
+  PHYSICAL_SECURITY
+  COMPLIANCE_VIOLATION
+  SYSTEM_COMPROMISE
+  NETWORK_INTRUSION
+  APPLICATION_VULNERABILITY
+  CONFIGURATION_ERROR
+  HUMAN_ERROR
+  NATURAL_DISASTER
+  OTHER
+}
+
+enum IncidentType {
+  SECURITY_INCIDENT
+  PRIVACY_INCIDENT
+  COMPLIANCE_INCIDENT
+  OPERATIONAL_INCIDENT
+  TECHNICAL_INCIDENT
+}
+
+enum IncidentSource {
+  INTERNAL
+  EXTERNAL
+  THIRD_PARTY
+  UNKNOWN
+}
+
+enum AttackVector {
+  EMAIL
+  WEB
+  NETWORK
+  PHYSICAL
+  SOCIAL
+  SUPPLY_CHAIN
+  INSIDER
+  API
+  MOBILE
+  CLOUD
+  OTHER
+}
+
+enum IncidentStatus {
+  NEW
+  ACKNOWLEDGED
+  INVESTIGATING
+  CONTAINMENT
+  ERADICATION
+  RECOVERY
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
+enum IncidentStage {
+  DETECTION
+  ANALYSIS
+  CONTAINMENT
+  ERADICATION
+  RECOVERY
+  LESSONS_LEARNED
+}
+
+enum IncidentImpact {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum TimelineCategory {
+  DETECTION
+  ANALYSIS
+  CONTAINMENT
+  COMMUNICATION
+  ERADICATION
+  RECOVERY
+  DOCUMENTATION
+  MANAGEMENT
+  EXTERNAL
+  OTHER
+}
+
+enum MFAMethod {
+  TOTP
+  SMS
+  EMAIL
+  HARDWARE_TOKEN
+  BIOMETRIC
+  BACKUP_CODES
+}

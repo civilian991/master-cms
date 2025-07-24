@@ -1,0 +1,1046 @@
+src/
+├── app
+│   ├── admin
+│   │   ├── articles
+│   │   │   └── page.tsx
+│   │   ├── categories
+│   │   │   └── page.tsx
+│   │   ├── content
+│   │   │   └── articles
+│   │   │       ├── [id]
+│   │   │       │   └── page.tsx
+│   │   │       ├── new
+│   │   │       │   └── page.tsx
+│   │   │       └── page.tsx
+│   │   ├── dashboard
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── media
+│   │   │   └── page.tsx
+│   │   ├── page.tsx
+│   │   ├── settings
+│   │   │   └── page.tsx
+│   │   ├── tags
+│   │   │   └── page.tsx
+│   │   └── users
+│   │       └── page.tsx
+│   ├── api
+│   │   ├── ab-testing
+│   │   │   ├── templates
+│   │   │   │   └── route.ts
+│   │   │   ├── tests
+│   │   │   │   ├── [id]
+│   │   │   │   │   ├── recommendations
+│   │   │   │   │   │   └── route.ts
+│   │   │   │   │   ├── results
+│   │   │   │   │   │   └── route.ts
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   └── workflows
+│   │   │       ├── [id]
+│   │   │       │   └── execute
+│   │   │       │       └── route.ts
+│   │   │       └── route.ts
+│   │   ├── admin
+│   │   │   ├── advertising
+│   │   │   │   ├── ads
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── analytics
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── campaigns
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── performance
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── placements
+│   │   │   │       └── route.ts
+│   │   │   ├── business-intelligence
+│   │   │   │   ├── data-sources
+│   │   │   │   │   └── [id]
+│   │   │   │   │       └── sync
+│   │   │   │   │           └── route.ts
+│   │   │   │   ├── etl
+│   │   │   │   │   └── [id]
+│   │   │   │   │       └── execute
+│   │   │   │   │           └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   ├── crm
+│   │   │   │   └── route.ts
+│   │   │   ├── payments
+│   │   │   │   └── route.ts
+│   │   │   ├── reports
+│   │   │   │   └── route.ts
+│   │   │   └── subscriptions
+│   │   │       ├── analytics
+│   │   │       │   └── route.ts
+│   │   │       ├── pricing
+│   │   │       │   └── route.ts
+│   │   │       ├── route.ts
+│   │   │       └── [subscriptionId]
+│   │   │           └── route.ts
+│   │   ├── ai
+│   │   │   ├── analytics
+│   │   │   │   ├── ab-testing
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── models
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── recommendations
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   ├── content-generation
+│   │   │   │   ├── advanced
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── generate
+│   │   │   │       └── route.ts
+│   │   │   ├── curation
+│   │   │   │   └── content
+│   │   │   │       └── route.ts
+│   │   │   ├── discovery
+│   │   │   │   ├── content
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── sources
+│   │   │   │       └── route.ts
+│   │   │   ├── generate
+│   │   │   │   └── route.ts
+│   │   │   ├── monitoring
+│   │   │   │   └── route.ts
+│   │   │   ├── optimization
+│   │   │   │   ├── accessibility
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── images
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── performance
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── quality
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── seo
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── stats
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── triggers
+│   │   │   │       └── route.ts
+│   │   │   ├── personalities
+│   │   │   │   ├── ab-testing
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── performance
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   └── trends
+│   │   │       └── route.ts
+│   │   ├── analytics
+│   │   │   ├── content
+│   │   │   │   └── route.ts
+│   │   │   ├── dashboard
+│   │   │   │   └── route.ts
+│   │   │   ├── export
+│   │   │   │   └── route.ts
+│   │   │   ├── health
+│   │   │   │   └── route.ts
+│   │   │   ├── mobile
+│   │   │   │   └── route.ts
+│   │   │   └── users
+│   │   │       └── route.ts
+│   │   ├── auth
+│   │   │   ├── mfa
+│   │   │   │   ├── route.ts
+│   │   │   │   ├── setup
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── verify
+│   │   │   │       └── route.ts
+│   │   │   ├── [...nextauth]
+│   │   │   │   └── route.ts
+│   │   │   ├── password
+│   │   │   │   ├── change
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── reset
+│   │   │   │       └── route.ts
+│   │   │   ├── sessions
+│   │   │   │   └── route.ts
+│   │   │   └── users
+│   │   │       ├── [id]
+│   │   │       │   └── route.ts
+│   │   │       └── route.ts
+│   │   ├── campaign-management
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── automations
+│   │   │   │   └── route.ts
+│   │   │   └── campaigns
+│   │   │       ├── [id]
+│   │   │       │   ├── duplicate
+│   │   │       │   │   └── route.ts
+│   │   │       │   ├── optimization
+│   │   │       │   │   └── route.ts
+│   │   │       │   ├── performance
+│   │   │       │   │   └── route.ts
+│   │   │       │   ├── route.ts
+│   │   │       │   └── status
+│   │   │       │       └── route.ts
+│   │   │       └── route.ts
+│   │   ├── categories
+│   │   │   └── route.ts
+│   │   ├── ccpa
+│   │   │   ├── consumer-rights
+│   │   │   │   └── route.ts
+│   │   │   └── privacy-notices
+│   │   │       └── route.ts
+│   │   ├── comments
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── moderation
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   ├── communities
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── members
+│   │   │   │   └── route.ts
+│   │   │   ├── moderation
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   ├── config
+│   │   │   └── route.ts
+│   │   ├── content
+│   │   │   ├── analytics
+│   │   │   │   └── [id]
+│   │   │   │       └── route.ts
+│   │   │   ├── articles
+│   │   │   │   ├── bulk
+│   │   │   │   │   └── route.ts
+│   │   │   │   ├── [id]
+│   │   │   │   │   ├── route.ts
+│   │   │   │   │   ├── versions
+│   │   │   │   │   │   └── route.ts
+│   │   │   │   │   └── workflow
+│   │   │   │   │       └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   ├── bulk
+│   │   │   │   └── route.ts
+│   │   │   ├── schedule
+│   │   │   │   └── route.ts
+│   │   │   ├── search
+│   │   │   │   └── route.ts
+│   │   │   └── workflow
+│   │   │       └── route.ts
+│   │   ├── content-marketing
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── calendar
+│   │   │   │   └── route.ts
+│   │   │   ├── distribute
+│   │   │   │   └── route.ts
+│   │   │   ├── distribution
+│   │   │   │   └── route.ts
+│   │   │   ├── optimization
+│   │   │   │   └── route.ts
+│   │   │   └── workflows
+│   │   │       └── route.ts
+│   │   ├── email-marketing
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── campaigns
+│   │   │   │   ├── [id]
+│   │   │   │   │   ├── route.ts
+│   │   │   │   │   └── send
+│   │   │   │   │       └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   ├── segments
+│   │   │   │   └── route.ts
+│   │   │   ├── templates
+│   │   │   │   └── route.ts
+│   │   │   └── workflows
+│   │   │       └── route.ts
+│   │   ├── encryption
+│   │   │   ├── data
+│   │   │   │   └── route.ts
+│   │   │   ├── files
+│   │   │   │   └── route.ts
+│   │   │   └── keys
+│   │   │       └── route.ts
+│   │   ├── events
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── registrations
+│   │   │   │   └── route.ts
+│   │   │   └── route.ts
+│   │   ├── forums
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── categories
+│   │   │   │   └── route.ts
+│   │   │   ├── moderation
+│   │   │   │   └── route.ts
+│   │   │   ├── notifications
+│   │   │   │   └── route.ts
+│   │   │   ├── posts
+│   │   │   │   └── route.ts
+│   │   │   ├── search
+│   │   │   │   └── route.ts
+│   │   │   └── threads
+│   │   │       └── route.ts
+│   │   ├── gamification
+│   │   │   ├── achievements
+│   │   │   │   └── route.ts
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── leaderboards
+│   │   │   │   └── route.ts
+│   │   │   └── points
+│   │   │       └── route.ts
+│   │   ├── gdpr
+│   │   │   ├── consent
+│   │   │   │   └── route.ts
+│   │   │   └── user-rights
+│   │   │       └── route.ts
+│   │   ├── influencer-outreach
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── campaigns
+│   │   │   │   └── route.ts
+│   │   │   ├── discovery
+│   │   │   │   └── route.ts
+│   │   │   ├── import-export
+│   │   │   │   └── route.ts
+│   │   │   ├── influencers
+│   │   │   │   ├── [id]
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   └── workflows
+│   │   │       ├── [id]
+│   │   │       │   └── execute
+│   │   │       │       └── route.ts
+│   │   │       └── route.ts
+│   │   ├── infrastructure
+│   │   │   ├── api-gateway
+│   │   │   │   └── route.ts
+│   │   │   ├── backup-recovery
+│   │   │   │   └── route.ts
+│   │   │   ├── caching-strategy
+│   │   │   │   └── route.ts
+│   │   │   ├── cdn
+│   │   │   │   └── route.ts
+│   │   │   ├── container-orchestration
+│   │   │   │   └── route.ts
+│   │   │   ├── database-scaling
+│   │   │   │   └── route.ts
+│   │   │   ├── infrastructure-as-code
+│   │   │   │   └── route.ts
+│   │   │   ├── infrastructure-testing
+│   │   │   │   └── route.ts
+│   │   │   ├── load-balancer
+│   │   │   │   └── route.ts
+│   │   │   ├── multi-site-infrastructure
+│   │   │   │   └── route.ts
+│   │   │   ├── performance-monitoring
+│   │   │   │   └── route.ts
+│   │   │   └── security
+│   │   │       └── route.ts
+│   │   ├── lead-generation
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── import-export
+│   │   │   │   └── route.ts
+│   │   │   ├── leads
+│   │   │   │   ├── [id]
+│   │   │   │   │   ├── convert
+│   │   │   │   │   │   └── route.ts
+│   │   │   │   │   ├── qualify
+│   │   │   │   │   │   └── route.ts
+│   │   │   │   │   ├── route.ts
+│   │   │   │   │   └── score
+│   │   │   │   │       └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   └── workflows
+│   │   │       └── route.ts
+│   │   ├── manifest
+│   │   │   └── route.ts
+│   │   ├── marketing-analytics
+│   │   │   ├── attribution
+│   │   │   │   └── route.ts
+│   │   │   ├── dashboard
+│   │   │   │   └── route.ts
+│   │   │   ├── export
+│   │   │   │   └── route.ts
+│   │   │   ├── forecasts
+│   │   │   │   └── route.ts
+│   │   │   ├── performance
+│   │   │   │   └── route.ts
+│   │   │   ├── realtime
+│   │   │   │   └── route.ts
+│   │   │   └── roi
+│   │   │       └── route.ts
+│   │   ├── marketing-automation
+│   │   │   ├── monitoring
+│   │   │   │   └── route.ts
+│   │   │   ├── templates
+│   │   │   │   └── route.ts
+│   │   │   └── workflows
+│   │   │       ├── [id]
+│   │   │       │   ├── analytics
+│   │   │       │   │   └── route.ts
+│   │   │       │   ├── execute
+│   │   │       │   │   └── route.ts
+│   │   │       │   └── route.ts
+│   │   │       └── route.ts
+│   │   ├── media
+│   │   │   └── route.ts
+│   │   ├── moderation
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── queue
+│   │   │   │   └── route.ts
+│   │   │   ├── reports
+│   │   │   │   └── route.ts
+│   │   │   ├── rules
+│   │   │   │   └── route.ts
+│   │   │   └── security
+│   │   │       └── route.ts
+│   │   ├── security
+│   │   │   ├── access-control
+│   │   │   │   └── route.ts
+│   │   │   ├── audit
+│   │   │   │   └── route.ts
+│   │   │   ├── dashboard
+│   │   │   │   └── route.ts
+│   │   │   ├── incident-response
+│   │   │   │   └── route.ts
+│   │   │   ├── monitoring
+│   │   │   │   └── route.ts
+│   │   │   ├── testing
+│   │   │   │   └── route.ts
+│   │   │   └── vulnerability-management
+│   │   │       └── route.ts
+│   │   ├── seo-tools
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── competitors
+│   │   │   │   ├── analyze
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   ├── keywords
+│   │   │   │   └── route.ts
+│   │   │   ├── recommendations
+│   │   │   │   └── route.ts
+│   │   │   ├── research
+│   │   │   │   └── route.ts
+│   │   │   └── workflows
+│   │   │       └── route.ts
+│   │   ├── social
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── feed
+│   │   │   │   └── route.ts
+│   │   │   ├── follow
+│   │   │   │   └── route.ts
+│   │   │   ├── notifications
+│   │   │   │   └── route.ts
+│   │   │   └── privacy
+│   │   │       └── route.ts
+│   │   ├── social-media
+│   │   │   ├── analytics
+│   │   │   │   └── route.ts
+│   │   │   ├── [id]
+│   │   │   │   ├── publish
+│   │   │   │   │   └── route.ts
+│   │   │   │   └── route.ts
+│   │   │   ├── platforms
+│   │   │   │   ├── route.ts
+│   │   │   │   └── test
+│   │   │   │       └── route.ts
+│   │   │   └── route.ts
+│   │   ├── tags
+│   │   │   └── route.ts
+│   │   ├── user-profiles
+│   │   │   ├── achievements
+│   │   │   │   └── route.ts
+│   │   │   ├── reputation
+│   │   │   │   └── route.ts
+│   │   │   ├── route.ts
+│   │   │   └── social
+│   │   │       └── route.ts
+│   │   └── webhooks
+│   │       └── payment-gateway
+│   │           └── route.ts
+│   ├── articles
+│   │   ├── page.tsx
+│   │   └── [slug]
+│   │       └── page.tsx
+│   ├── auth
+│   │   ├── reset-password
+│   │   │   └── page.tsx
+│   │   ├── signin
+│   │   │   └── page.tsx
+│   │   └── signup
+│   │       └── page.tsx
+│   ├── categories
+│   │   └── [slug]
+│   │       └── page.tsx
+│   ├── dashboard
+│   │   ├── analytics
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── notifications
+│   │   │   └── page.tsx
+│   │   ├── page.tsx
+│   │   ├── preferences
+│   │   │   └── page.tsx
+│   │   ├── profile
+│   │   │   └── page.tsx
+│   │   ├── security
+│   │   │   └── page.tsx
+│   │   └── subscription
+│   │       └── page.tsx
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   ├── [locale]
+│   │   ├── about
+│   │   │   └── page.tsx
+│   │   ├── articles
+│   │   │   └── page.tsx
+│   │   ├── categories
+│   │   │   └── page.tsx
+│   │   ├── contact
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── privacy
+│   │   │   └── page.tsx
+│   │   └── terms
+│   │       └── page.tsx
+│   ├── mobile-demo
+│   │   └── page.tsx
+│   ├── page.tsx
+│   ├── search
+│   │   └── page.tsx
+│   ├── (site)
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── sitemap.xml
+│   │   └── route.ts
+│   └── tags
+│       └── [slug]
+│           └── page.tsx
+├── components
+│   ├── ab-testing
+│   │   └── ABTestingDashboard.tsx
+│   ├── accessibility
+│   │   └── AccessibilitySettings.tsx
+│   ├── admin
+│   │   ├── admin-data-table.tsx
+│   │   ├── advertising
+│   │   │   └── AdvertisingDashboard.tsx
+│   │   ├── app-sidebar.tsx
+│   │   ├── business-intelligence
+│   │   │   └── BusinessIntelligenceDashboard.tsx
+│   │   ├── chart-area-interactive.tsx
+│   │   ├── command-palette.tsx
+│   │   ├── content
+│   │   │   └── articles-table.tsx
+│   │   ├── core
+│   │   │   ├── admin-form.tsx
+│   │   │   ├── admin-modal.tsx
+│   │   │   └── admin-table.tsx
+│   │   ├── crm
+│   │   │   └── CRMDashboard.tsx
+│   │   ├── nav-docs.tsx
+│   │   ├── nav-main.tsx
+│   │   ├── nav-secondary.tsx
+│   │   ├── nav-user.tsx
+│   │   ├── section-cards.tsx
+│   │   ├── site-header.tsx
+│   │   ├── subscriptions
+│   │   │   └── SubscriptionDashboard.tsx
+│   │   └── users
+│   │       └── users-table.tsx
+│   ├── ai
+│   │   ├── AdvancedContentGeneration.tsx
+│   │   ├── AIMonitoringDashboard.tsx
+│   │   ├── ContentDiscoveryDashboard.tsx
+│   │   ├── ContentGenerationForm.tsx
+│   │   ├── ContentOptimizationDashboard.tsx
+│   │   ├── PersonalityManagement.tsx
+│   │   └── PredictiveAnalyticsDashboard.tsx
+│   ├── analytics
+│   │   ├── MobileAnalytics.tsx
+│   │   ├── ReadingAnalyticsPanel.tsx
+│   │   └── ReadingAnalytics.tsx
+│   ├── audio
+│   │   ├── AudioContentPanel.tsx
+│   │   ├── AudioPlayer.tsx
+│   │   └── TextToSpeech.tsx
+│   ├── auth
+│   │   ├── MFASetupForm.tsx
+│   │   ├── PasswordResetForm.tsx
+│   │   ├── SignInForm.tsx
+│   │   ├── SignUpForm.tsx
+│   │   └── UserManagement.tsx
+│   ├── campaign-management
+│   │   └── CampaignManagementDashboard.tsx
+│   ├── config
+│   │   ├── BrandingProvider.tsx
+│   │   ├── ConfigurationProvider.tsx
+│   │   ├── NavigationProvider.tsx
+│   │   └── SEOProvider.tsx
+│   ├── content
+│   │   ├── ArticleEditor.tsx
+│   │   └── ArticleList.tsx
+│   ├── content-marketing
+│   │   └── ContentMarketingDashboard.tsx
+│   ├── dynamic
+│   │   └── index.tsx
+│   ├── email-marketing
+│   │   └── EmailMarketingDashboard.tsx
+│   ├── influencer-outreach
+│   │   └── InfluencerOutreachDashboard.tsx
+│   ├── infrastructure
+│   │   └── InfrastructureDashboard.tsx
+│   ├── lead-generation
+│   │   └── LeadGenerationDashboard.tsx
+│   ├── marketing-analytics
+│   │   └── MarketingAnalyticsDashboard.tsx
+│   ├── marketing-automation
+│   │   └── MarketingAutomationDashboard.tsx
+│   ├── mobile
+│   │   ├── BottomTabBar.tsx
+│   │   ├── index.ts
+│   │   ├── MobileCard.tsx
+│   │   ├── MobileCommunityDashboard.tsx
+│   │   ├── MobileContentDisplay.tsx
+│   │   ├── MobileDashboard.tsx
+│   │   ├── MobileDataDisplay.tsx
+│   │   ├── MobileForms.tsx
+│   │   ├── MobileLayout.tsx
+│   │   ├── MobileModals.tsx
+│   │   ├── MobileNavigation.tsx
+│   │   └── TouchOptimized.tsx
+│   ├── notifications
+│   │   └── NotificationSettings.tsx
+│   ├── offline
+│   │   └── OfflineManager.tsx
+│   ├── performance
+│   │   ├── CacheManager.tsx
+│   │   ├── OfflinePerformancePanel.tsx
+│   │   └── PerformanceMonitor.tsx
+│   ├── personalization
+│   │   ├── ContentFilter.tsx
+│   │   ├── PersonalizationPanel.tsx
+│   │   ├── RecommendationEngine.tsx
+│   │   └── UserPreferences.tsx
+│   ├── providers
+│   │   ├── index.tsx
+│   │   └── SessionProvider.tsx
+│   ├── pwa
+│   │   └── PWAComponents.tsx
+│   ├── reading
+│   │   ├── AIPanel.tsx
+│   │   ├── ArticleReader.tsx
+│   │   ├── BookmarkButton.tsx
+│   │   ├── ContentAnalytics.tsx
+│   │   ├── ContentClustering.tsx
+│   │   ├── ContentSummary.tsx
+│   │   ├── ReadingGoals.tsx
+│   │   ├── ReadingLists.tsx
+│   │   ├── ReadingProgress.tsx
+│   │   ├── RecommendationPanel.tsx
+│   │   └── SmartTagging.tsx
+│   ├── security
+│   │   └── SecurityDashboard.tsx
+│   ├── seo
+│   │   └── StructuredData.tsx
+│   ├── seo-tools
+│   │   └── SEOToolsDashboard.tsx
+│   ├── site
+│   │   ├── modern-article-card.tsx
+│   │   ├── modern-hero.tsx
+│   │   └── modern-navigation.tsx
+│   ├── social
+│   │   ├── CommentsSystem.tsx
+│   │   ├── FloatingReactions.tsx
+│   │   ├── ReactionSystem.tsx
+│   │   ├── SocialEngagementPanel.tsx
+│   │   └── SocialSharing.tsx
+│   ├── social-media
+│   │   ├── SocialMediaAutomation.tsx
+│   │   ├── SocialMediaCalendar.tsx
+│   │   ├── SocialMediaDashboard.tsx
+│   │   ├── SocialMediaManager.tsx
+│   │   └── SocialMediaOptimization.tsx
+│   ├── testing
+│   │   └── AccessibilityTester.tsx
+│   ├── __tests__
+│   │   ├── AudioPlayer.test.tsx
+│   │   ├── OfflineManager.test.tsx
+│   │   ├── ReadingInterface.test.tsx
+│   │   └── RecommendationEngine.test.tsx
+│   ├── touch
+│   │   └── TouchComponents.tsx
+│   ├── translation
+│   │   ├── ArticleTranslator.tsx
+│   │   ├── BilingualReader.tsx
+│   │   ├── LanguageSwitcher.tsx
+│   │   └── TranslationPanel.tsx
+│   ├── ui
+│   │   ├── alert.tsx
+│   │   ├── auth.tsx
+│   │   ├── avatar.tsx
+│   │   ├── badge.tsx
+│   │   ├── breadcrumb.tsx
+│   │   ├── button.tsx
+│   │   ├── calendar.tsx
+│   │   ├── card.tsx
+│   │   ├── carousel.tsx
+│   │   ├── checkbox.tsx
+│   │   ├── collapsible.tsx
+│   │   ├── command.tsx
+│   │   ├── content-client-wrapper.tsx
+│   │   ├── content-server-wrapper.tsx
+│   │   ├── content.tsx
+│   │   ├── dialog.tsx
+│   │   ├── dropdown-menu.tsx
+│   │   ├── form.tsx
+│   │   ├── icon.tsx
+│   │   ├── image-upload.tsx
+│   │   ├── input.tsx
+│   │   ├── label.tsx
+│   │   ├── layout.tsx
+│   │   ├── loading.tsx
+│   │   ├── navigation-menu.tsx
+│   │   ├── navigation.tsx
+│   │   ├── popover.tsx
+│   │   ├── progress.tsx
+│   │   ├── responsive-layout.tsx
+│   │   ├── select.tsx
+│   │   ├── separator.tsx
+│   │   ├── sheet.tsx
+│   │   ├── sidebar.tsx
+│   │   ├── skeleton.tsx
+│   │   ├── slider.tsx
+│   │   ├── switch.tsx
+│   │   ├── table.tsx
+│   │   ├── tabs.tsx
+│   │   ├── textarea.tsx
+│   │   ├── tiptap-editor-client.tsx
+│   │   ├── tiptap-editor.tsx
+│   │   └── tooltip.tsx
+│   └── user
+│       └── SubscriptionPortal.tsx
+├── config
+│   └── site.ts
+├── generated
+│   └── prisma
+│       ├── client.d.ts
+│       ├── client.js
+│       ├── default.d.ts
+│       ├── default.js
+│       ├── edge.d.ts
+│       ├── edge.js
+│       ├── index-browser.js
+│       ├── index.d.ts
+│       ├── index.js
+│       ├── libquery_engine-debian-openssl-3.0.x.so.node
+│       ├── package.json
+│       ├── runtime
+│       │   ├── edge-esm.js
+│       │   ├── edge.js
+│       │   ├── index-browser.d.ts
+│       │   ├── index-browser.js
+│       │   ├── library.d.ts
+│       │   ├── library.js
+│       │   ├── react-native.js
+│       │   ├── wasm-compiler-edge.js
+│       │   └── wasm-engine-edge.js
+│       ├── schema.prisma
+│       ├── wasm.d.ts
+│       └── wasm.js
+├── hooks
+│   ├── mobile
+│   │   ├── useAdvancedGestures.ts
+│   │   └── useSwipeGestures.ts
+│   ├── useGestures.ts
+│   ├── useMobileAnalytics.ts
+│   └── useMobileNavigation.ts
+├── lib
+│   ├── auth
+│   │   ├── analytics.ts
+│   │   ├── email.ts
+│   │   ├── index.ts
+│   │   ├── mfa.ts
+│   │   ├── middleware.ts
+│   │   ├── nextauth.ts
+│   │   ├── password-policy.ts
+│   │   ├── password.ts
+│   │   └── session-manager.ts
+│   ├── ccpa
+│   │   ├── ccpa-compliance.ts
+│   │   └── privacy-notices.ts
+│   ├── db.ts
+│   ├── encryption
+│   │   ├── database-encryption.ts
+│   │   ├── encryption-service.ts
+│   │   ├── file-encryption.ts
+│   │   └── monitoring.ts
+│   ├── gdpr
+│   │   ├── consent-management.ts
+│   │   ├── data-anonymization.ts
+│   │   └── user-rights.ts
+│   ├── hooks
+│   │   └── useTouchGestures.ts
+│   ├── prisma.ts
+│   ├── redis.ts
+│   ├── security
+│   │   ├── access-control
+│   │   │   ├── access-control-service.ts
+│   │   │   └── monitoring-service.ts
+│   │   ├── audit
+│   │   │   ├── audit-service.ts
+│   │   │   └── compliance-monitoring-service.ts
+│   │   ├── dashboard
+│   │   │   └── security-dashboard-service.ts
+│   │   ├── incident-response
+│   │   │   ├── incident-service.ts
+│   │   │   └── post-incident-service.ts
+│   │   ├── monitoring
+│   │   │   ├── alerting-service.ts
+│   │   │   ├── analytics-service.ts
+│   │   │   ├── correlation-engine.ts
+│   │   │   ├── siem-service.ts
+│   │   │   └── threat-detection.ts
+│   │   ├── testing
+│   │   │   ├── compliance-validation-service.ts
+│   │   │   └── security-testing-service.ts
+│   │   └── vulnerability-management
+│   │       ├── compliance-service.ts
+│   │       └── vulnerability-service.ts
+│   ├── services
+│   │   ├── ab-testing.ts
+│   │   ├── advertising.ts
+│   │   ├── ai
+│   │   │   ├── base.ts
+│   │   │   ├── content-curation.ts
+│   │   │   ├── content-discovery.ts
+│   │   │   ├── content-generation-advanced.ts
+│   │   │   ├── content-generation.ts
+│   │   │   ├── content-optimization.ts
+│   │   │   ├── gemini.ts
+│   │   │   ├── manager.ts
+│   │   │   ├── openai.ts
+│   │   │   ├── personality.ts
+│   │   │   ├── predictive-analytics.ts
+│   │   │   └── trend-analysis.ts
+│   │   ├── api-gateway.ts
+│   │   ├── backup-recovery.ts
+│   │   ├── billing.ts
+│   │   ├── browser-detection.ts
+│   │   ├── business-intelligence.ts
+│   │   ├── caching-strategy.ts
+│   │   ├── campaign-management.ts
+│   │   ├── categories.ts
+│   │   ├── cdn.ts
+│   │   ├── comments.ts
+│   │   ├── communities.ts
+│   │   ├── community-analytics.ts
+│   │   ├── container-orchestration.ts
+│   │   ├── content-marketing.ts
+│   │   ├── content.service.ts
+│   │   ├── content-simple.ts
+│   │   ├── content.ts
+│   │   ├── crm.ts
+│   │   ├── cross-platform-testing.ts
+│   │   ├── database-scaling.ts
+│   │   ├── device-optimization.ts
+│   │   ├── email-marketing.ts
+│   │   ├── events.ts
+│   │   ├── forums.ts
+│   │   ├── gamification.ts
+│   │   ├── gesture-service.ts
+│   │   ├── influencer-outreach.ts
+│   │   ├── infrastructure-as-code.ts
+│   │   ├── infrastructure-testing.ts
+│   │   ├── keyboard-navigation.ts
+│   │   ├── lead-generation.ts
+│   │   ├── load-balancer.ts
+│   │   ├── marketing-analytics.ts
+│   │   ├── marketing-automation.ts
+│   │   ├── media.ts
+│   │   ├── mobile-accessibility.ts
+│   │   ├── mobile-analytics-service.ts
+│   │   ├── mobile-cache.ts
+│   │   ├── mobile-navigation-service.ts
+│   │   ├── moderation.ts
+│   │   ├── motor-accessibility.ts
+│   │   ├── multi-site-infrastructure.ts
+│   │   ├── notification-analytics.ts
+│   │   ├── notification-scheduler.ts
+│   │   ├── notification-templates.ts
+│   │   ├── offline-sync.ts
+│   │   ├── payment-gateway.ts
+│   │   ├── performance-monitoring.ts
+│   │   ├── push-notifications.ts
+│   │   ├── pwa-installation-testing.ts
+│   │   ├── pwa-service.ts
+│   │   ├── reporting.ts
+│   │   ├── responsive-framework.ts
+│   │   ├── security.ts
+│   │   ├── seo-tools.ts
+│   │   ├── social-media.ts
+│   │   ├── social.ts
+│   │   ├── subscription.ts
+│   │   ├── user-profiles.ts
+│   │   ├── visual-accessibility.ts
+│   │   └── voice-control.ts
+│   ├── utils
+│   │   ├── critical-css.ts
+│   │   ├── lazy-loading.ts
+│   │   ├── mobile-performance.ts
+│   │   ├── readTime.ts
+│   │   ├── search.ts
+│   │   └── slug.ts
+│   ├── utils.ts
+│   └── validations
+│       ├── ai.ts
+│       ├── analytics.ts
+│       ├── monetization.ts
+│       ├── security.ts
+│       └── site.ts
+├── styles
+│   └── mobile
+│       └── responsive.css
+├── __tests__
+│   ├── ab-testing
+│   │   └── ab-testing-service.test.ts
+│   ├── accessibility
+│   │   ├── accessibility-integration.test.ts
+│   │   ├── basic-integration.test.ts
+│   │   └── reading-accessibility.test.tsx
+│   ├── ai
+│   │   ├── ai-service.test.ts
+│   │   ├── content-discovery.test.ts
+│   │   ├── content-generation-advanced.test.ts
+│   │   ├── content-optimization.test.ts
+│   │   ├── personality.test.ts
+│   │   └── predictive-analytics.test.ts
+│   ├── analytics
+│   │   └── mobile-analytics.test.tsx
+│   ├── api
+│   │   ├── business-intelligence.test.ts
+│   │   └── crm.test.ts
+│   ├── app
+│   │   ├── articles.test.tsx
+│   │   ├── branding-config.test.tsx
+│   │   ├── homepage.test.tsx
+│   │   ├── navigation-discovery.test.tsx
+│   │   └── seo-performance.test.tsx
+│   ├── audio
+│   │   └── text-to-speech.test.tsx
+│   ├── auth
+│   │   ├── advanced-authentication.test.ts
+│   │   └── nextauth.test.ts
+│   ├── campaign-management
+│   │   └── campaign-management-service.test.ts
+│   ├── ccpa
+│   │   └── ccpa-compliance.test.ts
+│   ├── components
+│   │   ├── ai-recommendations.test.tsx
+│   │   ├── BusinessIntelligenceDashboard.test.tsx
+│   │   ├── CRMDashboard.test.tsx
+│   │   ├── mobile-components.test.tsx
+│   │   ├── reading-interface.test.tsx
+│   │   └── ui
+│   │       ├── button.test.tsx
+│   │       ├── icon.test.tsx
+│   │       └── navigation.test.tsx
+│   ├── config
+│   │   └── site.test.ts
+│   ├── content-marketing
+│   │   └── content-marketing-service.test.ts
+│   ├── cross-platform
+│   │   ├── basic-compatibility.test.ts
+│   │   └── cross-platform-testing.test.ts
+│   ├── database
+│   │   └── schema.test.ts
+│   ├── e2e
+│   │   └── community-workflows.e2e.test.ts
+│   ├── email-marketing
+│   │   └── email-marketing-service.test.ts
+│   ├── encryption
+│   │   └── encryption-system.test.ts
+│   ├── gdpr
+│   │   └── gdpr-compliance.test.ts
+│   ├── influencer-outreach
+│   │   └── influencer-outreach-service.test.ts
+│   ├── infrastructure
+│   │   ├── api-gateway-service.test.ts
+│   │   ├── caching-strategy-service.test.ts
+│   │   ├── cdn-service.test.ts
+│   │   ├── container-orchestration-service.test.ts
+│   │   ├── database-scaling-service.test.ts
+│   │   ├── infrastructure-as-code-service.test.ts
+│   │   ├── infrastructure-testing-service.test.ts
+│   │   ├── multi-site-infrastructure-service.test.ts
+│   │   ├── performance-monitoring-service.test.ts
+│   │   └── security-service.test.ts
+│   ├── lead-generation
+│   │   └── lead-generation-service.test.ts
+│   ├── marketing-analytics
+│   │   └── marketing-analytics-service.test.ts
+│   ├── marketing-automation
+│   │   └── marketing-automation-service.test.ts
+│   ├── mobile
+│   │   ├── mobile-components.test.tsx
+│   │   ├── mobile-navigation.test.tsx
+│   │   └── mobile-optimization.test.ts
+│   ├── multilanguage
+│   │   └── translation-quality.test.tsx
+│   ├── notifications
+│   │   ├── integration.test.ts
+│   │   └── push-notifications.test.ts
+│   ├── performance
+│   │   ├── content-performance.test.tsx
+│   │   ├── mobile-performance.test.ts
+│   │   └── performance-optimization.test.ts
+│   ├── pwa
+│   │   └── pwa-service.test.ts
+│   ├── responsive
+│   │   └── mobile-responsive-framework.test.ts
+│   ├── security
+│   │   ├── access-control
+│   │   │   └── access-control.test.ts
+│   │   ├── audit
+│   │   │   └── audit-logging.test.ts
+│   │   ├── dashboard
+│   │   │   └── security-dashboard.test.ts
+│   │   ├── incident-response
+│   │   │   └── incident-response.test.ts
+│   │   ├── monitoring
+│   │   │   └── security-monitoring.test.ts
+│   │   ├── security-assessment.test.ts
+│   │   ├── testing
+│   │   │   └── security-testing.test.ts
+│   │   └── vulnerability-management
+│   │       └── vulnerability-management.test.ts
+│   ├── seo-tools
+│   │   └── seo-tools-service.test.ts
+│   ├── services
+│   │   ├── business-intelligence.test.ts
+│   │   ├── comments-service.test.ts
+│   │   ├── communities-service.test.ts
+│   │   ├── community-analytics-service.test.ts
+│   │   ├── content.test.ts
+│   │   ├── crm.test.ts
+│   │   ├── events-service.test.ts
+│   │   ├── forums-service.test.ts
+│   │   ├── gamification-service.test.ts
+│   │   ├── moderation-service.test.ts
+│   │   ├── reporting.test.ts
+│   │   ├── social-service.test.ts
+│   │   ├── subscription.test.ts
+│   │   └── user-profiles-service.test.ts
+│   ├── social-media
+│   │   └── social-media-service.test.ts
+│   └── touch
+│       └── gesture-service.test.ts
+└── types
+    ├── database.ts
+    └── next-auth.d.ts
+
+396 directories, 648 files
