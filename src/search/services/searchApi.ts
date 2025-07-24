@@ -1167,4 +1167,3 @@ interface SearchApiConfig {
 // Export singleton instance
 export const searchApi = new SearchApiService();
 export default searchApi; 
-export default searchApi; 
