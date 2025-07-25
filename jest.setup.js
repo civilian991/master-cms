@@ -1,5 +1,76 @@
 import '@testing-library/jest-dom';
 
+// Mock Prisma Client completely for all tests
+jest.mock('@/lib/prisma', () => ({
+  prisma: {
+    user: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+    },
+    site: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      findFirst: jest.fn(),
+      findMany: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    article: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      count: jest.fn(),
+    },
+    category: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    tag: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    media: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+    },
+    securityEvent: {
+      create: jest.fn(),
+      findMany: jest.fn(),
+    },
+    siteSetting: {
+      create: jest.fn(),
+      upsert: jest.fn(),
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+    },
+    sitePermission: {
+      create: jest.fn(),
+      findUnique: jest.fn(),
+      findMany: jest.fn(),
+    },
+    // Add other models as needed
+    $connect: jest.fn(),
+    $disconnect: jest.fn(),
+    $transaction: jest.fn((callback) => callback()),
+  },
+}));
+
 // Mock Next.js router
 jest.mock('next/router', () => ({
   useRouter() {

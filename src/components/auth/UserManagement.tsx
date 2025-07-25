@@ -45,7 +45,7 @@ import {
 } from 'lucide-react';
 
 interface User {
-  id: number;
+  id: string;
   email: string;
   name: string;
   mfaEnabled: boolean;
@@ -54,26 +54,26 @@ interface User {
   lockedUntil: string | null;
   createdAt: string;
   siteRoles: Array<{
-    id: number;
+    id: string;
     site: {
-      id: number;
+      id: string;
       name: string;
     };
     role: {
-      id: number;
+      id: string;
       name: string;
     };
   }>;
 }
 
 interface Role {
-  id: number;
+  id: string;
   name: string;
-  description: string;
+  description?: string;
 }
 
 interface Site {
-  id: number;
+  id: string;
   name: string;
   domain: string;
 }
@@ -183,8 +183,8 @@ export function UserManagement({ siteId }: UserManagementProps) {
           name: formData.name,
           email: formData.email,
           password: formData.password,
-          roleId: parseInt(formData.roleId),
-          siteId: parseInt(formData.siteId),
+          roleId: formData.roleId,
+          siteId: formData.siteId,
         }),
       });
 
@@ -220,8 +220,8 @@ export function UserManagement({ siteId }: UserManagementProps) {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          roleId: formData.roleId ? parseInt(formData.roleId) : undefined,
-          siteId: formData.siteId ? parseInt(formData.siteId) : undefined,
+          roleId: formData.roleId || undefined,
+          siteId: formData.siteId || undefined,
         }),
       });
 
@@ -242,7 +242,7 @@ export function UserManagement({ siteId }: UserManagementProps) {
     }
   };
 
-  const handleDeleteUser = async (userId: number) => {
+  const handleDeleteUser = async (userId: string) => {
     if (!confirm('Are you sure you want to delete this user?')) return;
 
     setIsLoading(true);
@@ -284,8 +284,8 @@ export function UserManagement({ siteId }: UserManagementProps) {
       name: user.name || '',
       email: user.email,
       password: '',
-      roleId: user.siteRoles[0]?.role.id.toString() || '',
-      siteId: user.siteRoles[0]?.site.id.toString() || '',
+      roleId: user.siteRoles[0]?.role.id || '',
+      siteId: user.siteRoles[0]?.site.id || '',
     });
     setIsEditDialogOpen(true);
   };
@@ -304,7 +304,7 @@ export function UserManagement({ siteId }: UserManagementProps) {
     const primaryRole = user.siteRoles[0];
     if (!primaryRole) return <Badge variant="outline">No Role</Badge>;
 
-    const roleColors: { [key: string]: string } = {
+    const roleColors: { [key: string]: "destructive" | "default" | "secondary" | "outline" } = {
       'SUPER_ADMIN': 'destructive',
       'ADMIN': 'default',
       'EDITOR': 'secondary',
@@ -403,7 +403,7 @@ export function UserManagement({ siteId }: UserManagementProps) {
                       </SelectTrigger>
                       <SelectContent>
                         {roles.map((role) => (
-                          <SelectItem key={role.id} value={role.id.toString()}>
+                          <SelectItem key={role.id} value={role.id}>
                             {role.name}
                           </SelectItem>
                         ))}
@@ -418,7 +418,7 @@ export function UserManagement({ siteId }: UserManagementProps) {
                       </SelectTrigger>
                       <SelectContent>
                         {sites.map((site) => (
-                          <SelectItem key={site.id} value={site.id.toString()}>
+                          <SelectItem key={site.id} value={site.id}>
                             {site.name}
                           </SelectItem>
                         ))}
@@ -463,11 +463,11 @@ export function UserManagement({ siteId }: UserManagementProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="">All Roles</SelectItem>
-                {roles.map((role) => (
-                  <SelectItem key={role.id} value={role.id.toString()}>
-                    {role.name}
-                  </SelectItem>
-                ))}
+                                                {roles.map((role) => (
+                                  <SelectItem key={role.id} value={role.id}>
+                                    {role.name}
+                                  </SelectItem>
+                                ))}
               </SelectContent>
             </Select>
             <Select value={selectedStatus} onValueChange={setSelectedStatus}>
@@ -559,13 +559,13 @@ export function UserManagement({ siteId }: UserManagementProps) {
                                 <SelectTrigger>
                                   <SelectValue placeholder="Select a role" />
                                 </SelectTrigger>
-                                <SelectContent>
-                                  {roles.map((role) => (
-                                    <SelectItem key={role.id} value={role.id.toString()}>
-                                      {role.name}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
+                                                  <SelectContent>
+                    {roles.map((role) => (
+                      <SelectItem key={role.id} value={role.id}>
+                        {role.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
                               </Select>
                             </div>
                             <div className="flex space-x-2">

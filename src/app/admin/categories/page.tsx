@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -367,13 +368,20 @@ export default function CategoriesManagement() {
             Organize your content with categories and subcategories
           </p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
+        <div className="flex space-x-2">
+          <Link href="/admin/categories/new">
             <Button>
               <Plus className="h-4 w-4 mr-2" />
               Add Category
             </Button>
-          </DialogTrigger>
+          </Link>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <Plus className="h-4 w-4 mr-2" />
+                Quick Add
+              </Button>
+            </DialogTrigger>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
               <DialogTitle>Create New Category</DialogTitle>
@@ -384,6 +392,7 @@ export default function CategoriesManagement() {
             <CategoryForm onSubmit={handleCreateCategory} submitLabel="Create Category" />
           </DialogContent>
         </Dialog>
+        </div>
       </div>
 
       {/* Stats Cards */}

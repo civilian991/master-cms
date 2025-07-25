@@ -41,9 +41,7 @@ export async function GET(request: NextRequest) {
 
     // Add role filter
     if (roleId) {
-      where.userSiteRoles = {
-        some: { roleId: parseInt(roleId) }
-      }
+      where.role = roleId
     }
 
     // Add status filter
@@ -55,9 +53,7 @@ export async function GET(request: NextRequest) {
 
     // Add site filter
     if (siteId) {
-      where.userSiteRoles = {
-        some: { siteId: parseInt(siteId) }
-      }
+      where.siteId = siteId
     }
 
     const [users, totalCount] = await Promise.all([

@@ -42,14 +42,19 @@ export interface User {
   mfaEnabled: boolean
   lockedUntil?: string
   lastLoginAt?: string
-  loginCount: number
+  loginCount?: number
   avatar?: string
   locale: 'en' | 'ar'
   siteRoles: Array<{
-    siteId: string
-    siteName: string
-    role: string
-    permissions: string[]
+    id: string
+    site: {
+      id: string
+      name: string
+    }
+    role: {
+      id: string
+      name: string
+    }
   }>
   securityEvents: Array<{
     type: string
@@ -77,10 +82,15 @@ const mockUsers: User[] = [
     locale: "en",
     siteRoles: [
       {
-        siteId: "1",
-        siteName: "Main Site",
-        role: "ADMIN",
-        permissions: ["create", "read", "update", "delete", "manage_users"]
+        id: "1",
+        site: {
+          id: "1",
+          name: "Main Site"
+        },
+        role: {
+          id: "ADMIN",
+          name: "ADMIN"
+        }
       }
     ],
     securityEvents: [
@@ -107,10 +117,15 @@ const mockUsers: User[] = [
     locale: "en",
     siteRoles: [
       {
-        siteId: "1",
-        siteName: "Main Site",
-        role: "EDITOR",
-        permissions: ["create", "read", "update", "publish"]
+        id: "1",
+        site: {
+          id: "1",
+          name: "Main Site"
+        },
+        role: {
+          id: "EDITOR",
+          name: "EDITOR"
+        }
       }
     ],
     securityEvents: [
@@ -138,10 +153,15 @@ const mockUsers: User[] = [
     locale: "ar",
     siteRoles: [
       {
-        siteId: "1",
-        siteName: "Main Site",
-        role: "AUTHOR",
-        permissions: ["create", "read", "update"]
+        id: "1",
+        site: {
+          id: "1",
+          name: "Main Site"
+        },
+        role: {
+          id: "AUTHOR",
+          name: "AUTHOR"
+        }
       }
     ],
     securityEvents: [
@@ -173,7 +193,7 @@ export function UsersTable() {
       setLoading(true)
       setError(null)
       try {
-        const response = await fetch('/api/admin/users')
+        const response = await fetch('/api/auth/users')
         if (!response.ok) {
           throw new Error('Failed to load users')
         }
@@ -216,18 +236,24 @@ export function UsersTable() {
       key: "role",
       label: "Role",
       sortable: true,
-      render: (role) => {
+      render: (_, user) => {
         const roleConfig = {
           ADMIN: { variant: "default" as const, icon: CrownIcon },
           EDITOR: { variant: "secondary" as const, icon: EditIcon },
           AUTHOR: { variant: "outline" as const, icon: UserIcon },
-          USER: { variant: "outline" as const, icon: UserIcon }
+          USER: { variant: "outline" as const, icon: UserIcon },
+          PUBLISHER: { variant: "outline" as const, icon: UserIcon }
         }
-        const { variant, icon: Icon } = roleConfig[role as keyof typeof roleConfig]
+        
+        // Get role from siteRoles array (API structure)
+        const userRole = user.siteRoles?.[0]?.role?.id || user.role || 'USER'
+        const config = roleConfig[userRole as keyof typeof roleConfig] || roleConfig.USER
+        const { variant, icon: Icon } = config
+        
         return (
           <Badge variant={variant} className="gap-1">
             <Icon className="h-3 w-3" />
-            {role}
+            {userRole}
           </Badge>
         )
       }
@@ -295,11 +321,11 @@ export function UsersTable() {
       label: "Site Access",
       render: (_, user) => (
         <div className="flex flex-wrap gap-1">
-          {user.siteRoles.slice(0, 2).map((siteRole, index) => (
-            <Badge key={index} variant="outline" className="text-xs">
-              {siteRole.siteName}: {siteRole.role}
-            </Badge>
-          ))}
+                  {user.siteRoles.slice(0, 2).map((siteRole, index) => (
+          <Badge key={index} variant="outline" className="text-xs">
+            {siteRole.site.name}: {siteRole.role.name}
+          </Badge>
+        ))}
           {user.siteRoles.length > 2 && (
             <Badge variant="outline" className="text-xs">
               +{user.siteRoles.length - 2} more
@@ -334,7 +360,7 @@ export function UsersTable() {
       render: (count) => (
         <div className="flex items-center gap-2">
           <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-          {count.toLocaleString()}
+          {count ? count.toLocaleString() : '0'}
         </div>
       )
     }

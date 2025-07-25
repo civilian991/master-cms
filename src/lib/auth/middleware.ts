@@ -8,7 +8,13 @@ const PUBLIC_PATHS = [
   '/auth/signin',
   '/auth/signout',
   '/auth/error',
-  '/api/auth',
+  '/api/auth/signin',
+  '/api/auth/signout',
+  '/api/auth/callback',
+  '/api/auth/session',
+  '/api/auth/providers',
+  '/api/auth/csrf',
+  '/api/auth/[...nextauth]',
   '/api/webhooks',
   '/_next',
   '/favicon.ico',
@@ -19,14 +25,15 @@ const API_PATHS = [
   '/api/media',
   '/api/categories',
   '/api/tags',
-  '/api/users',
+  '/api/auth/users',
+  '/api/sites',
   '/api/admin',
 ]
 
 // Role-based route protection
 const ROLE_ROUTES = {
   [ROLES.SUPER_ADMIN]: ['/admin', '/api/admin'],
-  [ROLES.ADMIN]: ['/admin', '/api/admin', '/api/users'],
+  [ROLES.ADMIN]: ['/admin', '/api/admin', '/api/auth/users'],
   [ROLES.EDITOR]: ['/admin/content', '/admin/media', '/api/content', '/api/media'],
   [ROLES.PUBLISHER]: ['/admin/content', '/api/content'],
   [ROLES.USER]: ['/admin/profile', '/api/content/articles'],
@@ -60,11 +67,14 @@ const API_PERMISSIONS = {
     PUT: [PERMISSIONS.MANAGE_TAGS],
     DELETE: [PERMISSIONS.MANAGE_TAGS],
   },
-  '/api/users': {
+  '/api/auth/users': {
     GET: [PERMISSIONS.VIEW_USERS],
     POST: [PERMISSIONS.MANAGE_USERS],
     PUT: [PERMISSIONS.MANAGE_USERS],
     DELETE: [PERMISSIONS.MANAGE_USERS],
+  },
+  '/api/sites': {
+    GET: [PERMISSIONS.VIEW_USERS], // Sites viewing requires user permissions
   },
 }
 
@@ -89,7 +99,8 @@ export async function authMiddleware(request: NextRequest) {
 
   // Check if user has access to the site
   const siteId = getSiteIdFromRequest(request)
-  if (token.siteId !== siteId) {
+  // Allow access if site ID matches or if using default/localhost
+  if (token.siteId !== siteId && siteId !== 'default') {
     return NextResponse.json(
       { error: 'Access denied for this site' },
       { status: 403 }
@@ -143,6 +154,12 @@ export async function authMiddleware(request: NextRequest) {
 
 // Helper functions
 function isPublicPath(pathname: string): boolean {
+  // Handle NextAuth routes explicitly
+  if (pathname.startsWith('/api/auth/')) {
+    // Allow all NextAuth internal routes except our custom ones
+    return !pathname.startsWith('/api/auth/users')
+  }
+  
   return PUBLIC_PATHS.some(path => pathname.startsWith(path))
 }
 
@@ -195,7 +212,7 @@ export async function rateLimitMiddleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  const ip = request.ip || 'unknown'
+  const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
   const key = `rate_limit:${ip}:${pathname}`
   
   // This would integrate with Redis for actual rate limiting
@@ -274,13 +291,42 @@ export async function combinedMiddleware(request: NextRequest) {
 }
 
 // Utility functions for use in API routes
-export function getUserFromRequest(request: NextRequest) {
-  return {
-    id: request.headers.get('x-user-id'),
-    role: request.headers.get('x-user-role'),
-    siteId: request.headers.get('x-user-site-id'),
-    permissions: JSON.parse(request.headers.get('x-user-permissions') || '[]'),
+export async function getUserFromRequest(request: NextRequest) {
+  // First try to get user from middleware headers
+  const userId = request.headers.get('x-user-id')
+  const userRole = request.headers.get('x-user-role')
+  const userSiteId = request.headers.get('x-user-site-id')
+  const userPermissions = request.headers.get('x-user-permissions')
+
+  if (userId && userRole && userSiteId) {
+    return {
+      id: userId,
+      role: userRole,
+      siteId: userSiteId,
+      permissions: JSON.parse(userPermissions || '[]'),
+    }
   }
+
+  // Fallback: Try to get user from NextAuth JWT token directly
+  try {
+    const token = await getToken({ 
+      req: request, 
+      secret: process.env.NEXTAUTH_SECRET 
+    })
+
+    if (token) {
+      return {
+        id: token.userId as string,
+        role: token.role as string,
+        siteId: token.siteId as string,
+        permissions: (token.permissions as string[]) || [],
+      }
+    }
+  } catch (error) {
+    console.error('Error getting user from token:', error)
+  }
+
+  return null
 }
 
 export function requireAuth(handler: Function) {

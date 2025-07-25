@@ -3,6 +3,7 @@ import { z } from 'zod'
 // Site Configuration Schema
 export const siteConfigSchema = z.object({
   // Basic Site Information
+  siteId: z.string().min(1, 'Site ID is required').default('1'),
   name: z.string().min(1, 'Site name is required'),
   domain: z.string().url('Valid domain URL is required'),
   description: z.string().optional(),
@@ -84,6 +85,7 @@ export type SiteConfig = z.infer<typeof siteConfigSchema>
 
 // Default Configuration
 export const defaultSiteConfig: SiteConfig = {
+  siteId: '1',
   name: 'Master CMS Framework',
   domain: 'http://localhost:3000',
   description: 'AI-Powered CMS Framework for Media Companies',
@@ -177,6 +179,7 @@ export class SiteConfigurationManager {
     const envConfig: Partial<SiteConfig> = {}
 
     // Basic site information
+    if (process.env.SITE_ID) envConfig.siteId = process.env.SITE_ID
     if (process.env.SITE_NAME) envConfig.name = process.env.SITE_NAME
     if (process.env.SITE_DOMAIN) envConfig.domain = process.env.SITE_DOMAIN
     if (process.env.SITE_DESCRIPTION) envConfig.description = process.env.SITE_DESCRIPTION
@@ -327,6 +330,7 @@ export class SiteConfigurationManager {
     const envConfig: Record<string, string> = {}
     
     // Convert config to environment variables format
+    if (this.config.siteId) envConfig.SITE_ID = this.config.siteId
     if (this.config.name) envConfig.SITE_NAME = this.config.name
     if (this.config.domain) envConfig.SITE_DOMAIN = this.config.domain
     if (this.config.description) envConfig.SITE_DESCRIPTION = this.config.description

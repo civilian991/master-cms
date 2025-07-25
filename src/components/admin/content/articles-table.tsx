@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import {
   FileTextIcon,
   PlusIcon,
@@ -117,12 +117,13 @@ const articlesApi = {
     if (params.siteId) searchParams.set('siteId', params.siteId)
 
     const response = await fetch(`/api/content/articles?${searchParams}`)
-    const data = await response.json()
     
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to fetch articles')
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
     }
     
+    const data = await response.json()
     return data
   },
 
@@ -134,12 +135,12 @@ const articlesApi = {
       body: JSON.stringify(articleData)
     })
     
-    const data = await response.json()
-    
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to create article')
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
     }
     
+    const data = await response.json()
     return data
   },
 
@@ -151,12 +152,12 @@ const articlesApi = {
       body: JSON.stringify(articleData)
     })
     
-    const data = await response.json()
-    
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to update article')
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
     }
     
+    const data = await response.json()
     return data
   },
 
@@ -166,12 +167,12 @@ const articlesApi = {
       method: 'DELETE'
     })
     
-    const data = await response.json()
-    
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to delete article')
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
     }
     
+    const data = await response.json()
     return data
   },
 
@@ -187,12 +188,12 @@ const articlesApi = {
       })
     })
     
-    const result = await response.json()
-    
     if (!response.ok) {
-      throw new Error(result.error || 'Failed to perform bulk operation')
+      const errorText = await response.text()
+      throw new Error(`HTTP ${response.status}: ${errorText}`)
     }
     
+    const result = await response.json()
     return result
   }
 }
@@ -212,7 +213,7 @@ export function ArticlesTable() {
   const { toast } = useToast()
 
   // Load articles from API
-  const loadArticles = async (params: {
+  const loadArticles = useCallback(async (params: {
     page?: number
     search?: string
   } = {}) => {
@@ -227,8 +228,8 @@ export function ArticlesTable() {
         siteId: "1" // Get from context/session
       })
       
-      setArticles(response.data.articles)
-      setTotalCount(response.data.total)
+      setArticles(response.data.articles || [])
+      setTotalCount(response.data.total || 0)
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Failed to load articles'
       setError(errorMessage)
@@ -240,12 +241,12 @@ export function ArticlesTable() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [currentPage, searchQuery])
 
   // Load data on component mount and when dependencies change
   useEffect(() => {
     loadArticles()
-  }, [currentPage])
+  }, [loadArticles])
 
   // Search with debounce
   useEffect(() => {
@@ -258,7 +259,7 @@ export function ArticlesTable() {
     }, 500)
 
     return () => clearTimeout(timeoutId)
-  }, [searchQuery])
+  }, [searchQuery, loadArticles, currentPage])
 
   // Table columns configuration
   const columns: AdminTableColumn<Article>[] = [

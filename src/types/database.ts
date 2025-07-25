@@ -64,15 +64,36 @@ export interface User {
 export interface Article {
   id: string;
   slug: string;
-  titleEn: string;
+  titleEn?: string;
   titleAr?: string;
-  contentEn: string;
+  contentEn?: string;
   contentAr?: string;
   excerptEn?: string;
   excerptAr?: string;
   featuredImage?: string;
   status: ArticleStatus;
+  workflowState: WorkflowState;
+  published: boolean;
   publishedAt?: Date;
+  scheduledAt?: Date;
+  expiresAt?: Date;
+  version: number;
+  parentVersionId?: string;
+  templateId?: string;
+  viewCount: number;
+  engagementScore: number;
+  readTime?: number;
+  seoTitleEn?: string;
+  seoTitleAr?: string;
+  seoDescriptionEn?: string;
+  seoDescriptionAr?: string;
+  seoKeywordsEn?: string;
+  seoKeywordsAr?: string;
+  canonicalUrl?: string;
+  reviewedBy?: string;
+  reviewedAt?: Date;
+  approvedBy?: string;
+  approvedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
   
@@ -81,12 +102,19 @@ export interface Article {
   site?: Site;
   authorId: string;
   author?: User;
-  categoryId: string;
+  categoryId?: string;
   category?: Category;
-  tags?: Tag[];
+  tags?: ArticleTag[];
   media?: Media[];
+  comments?: Comment[];
   contentAnalytics?: ContentAnalytics[];
   contentOptimizations?: ContentOptimization[];
+  parentVersion?: Article;
+  versions?: Article[];
+  template?: ContentTemplate;
+  reviewer?: User;
+  approver?: User;
+  contentSearchIndex?: ContentSearchIndex;
 }
 
 export interface Category {
@@ -128,20 +156,30 @@ export interface Tag {
 export interface Media {
   id: string;
   filename: string;
+  originalName: string;
   path: string;
+  thumbnailPath?: string;
+  optimizedPath?: string;
   mimeType: string;
   size: number;
   width?: number;
   height?: number;
   altTextEn?: string;
   altTextAr?: string;
+  captionEn?: string;
+  captionAr?: string;
+  descriptionEn?: string;
+  descriptionAr?: string;
+  usageCount: number;
+  lastUsedAt?: Date;
   createdAt: Date;
+  updatedAt: Date;
   
   // Relations
   siteId: string;
   site?: Site;
-  uploadedById: string;
-  uploadedBy?: User;
+  userId?: string;
+  user?: User;
   articles?: Article[];
 }
 
@@ -179,14 +217,33 @@ export interface NewsletterSubscriber {
 export interface SecurityEvent {
   id: string;
   eventType: SecurityEventType;
+  severity: SecuritySeverity;
+  title?: string;
+  description?: string;
+  source?: string;
+  metadata: any;
   ipAddress?: string;
   userAgent?: string;
+  location?: any;
+  deviceInfo?: any;
   success: boolean;
+  detected: boolean;
+  resolved: boolean;
+  falsePositive: boolean;
+  responseTime?: Date;
+  responseUserId?: string;
+  responseActions: any[];
+  detectedAt: Date;
+  resolvedAt?: Date;
   createdAt: Date;
+  updatedAt: Date;
   
   // Relations
+  siteId?: string;
+  site?: Site;
   userId?: string;
   user?: User;
+  responseUser?: User;
 }
 
 export interface SiteSetting {
@@ -470,6 +527,126 @@ export interface ContentOptimization {
   article?: Article;
 }
 
+// Missing Core Models from Prisma Schema
+
+export interface ArticleTag {
+  id: string;
+  articleId: string;
+  tagId: string;
+  createdAt: Date;
+  
+  // Relations
+  article?: Article;
+  tag?: Tag;
+}
+
+export interface ContentTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  content: any; // JSON template structure
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  articles?: Article[];
+  contentGenerationSessions?: ContentGenerationSession[];
+  contentSchedules?: ContentSchedule[];
+}
+
+export interface ContentWorkflow {
+  id: string;
+  name: string;
+  description?: string;
+  steps: any; // JSON workflow configuration
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+}
+
+export interface ContentSearchIndex {
+  id: string;
+  articleId: string;
+  searchTextEn: string;
+  searchTextAr: string;
+  tags: string[];
+  category?: string;
+  author?: string;
+  searchRank: number;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  article?: Article;
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  isApproved: boolean;
+  authorName?: string;
+  authorEmail?: string;
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  articleId: string;
+  article?: Article;
+  siteId: string;
+  site?: Site;
+  userId?: string;
+  user?: User;
+  parentId?: string;
+  parent?: Comment;
+  children?: Comment[];
+}
+
+export interface ContentGenerationSession {
+  id: string;
+  name: string;
+  description?: string;
+  prompt: string;
+  parameters: any; // JSON parameters
+  status: GenerationStatus;
+  startedAt: Date;
+  completedAt?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  templateId?: string;
+  template?: ContentTemplate;
+}
+
+export interface ContentSchedule {
+  id: string;
+  name: string;
+  description?: string;
+  schedule: any; // JSON schedule configuration
+  isActive: boolean;
+  lastRun?: Date;
+  nextRun?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  templateId?: string;
+  template?: ContentTemplate;
+}
+
 // Enums
 
 export enum UserRole {
@@ -585,4 +762,364 @@ export enum WorkflowStatus {
   PAUSED = 'PAUSED',
   COMPLETED = 'COMPLETED',
   ERROR = 'ERROR'
+}
+
+// Missing Enums from Prisma Schema
+
+export enum WorkflowState {
+  DRAFT = 'DRAFT',
+  IN_REVIEW = 'IN_REVIEW',
+  APPROVED = 'APPROVED',
+  PUBLISHED = 'PUBLISHED',
+  ARCHIVED = 'ARCHIVED',
+  REJECTED = 'REJECTED'
+}
+
+export enum SecuritySeverity {
+  CRITICAL = 'CRITICAL',
+  HIGH = 'HIGH',
+  MEDIUM = 'MEDIUM',
+  LOW = 'LOW',
+  INFO = 'INFO'
+}
+
+export enum LeadStatus {
+  NEW = 'NEW',
+  CONTACTED = 'CONTACTED',
+  QUALIFIED = 'QUALIFIED',
+  PROPOSAL_SENT = 'PROPOSAL_SENT',
+  NEGOTIATION = 'NEGOTIATION',
+  CONVERTED = 'CONVERTED',
+  LOST = 'LOST',
+  DISQUALIFIED = 'DISQUALIFIED'
+}
+
+export enum ContactStatus {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  PROSPECT = 'PROSPECT',
+  CUSTOMER = 'CUSTOMER',
+  PARTNER = 'PARTNER',
+  VENDOR = 'VENDOR'
+}
+
+export enum DealStage {
+  PROSPECTING = 'PROSPECTING',
+  QUALIFICATION = 'QUALIFICATION',
+  PROPOSAL = 'PROPOSAL',
+  NEGOTIATION = 'NEGOTIATION',
+  CLOSED_WON = 'CLOSED_WON',
+  CLOSED_LOST = 'CLOSED_LOST'
+}
+
+export enum InteractionType {
+  EMAIL = 'EMAIL',
+  PHONE_CALL = 'PHONE_CALL',
+  MEETING = 'MEETING',
+  CHAT = 'CHAT',
+  SOCIAL_MEDIA = 'SOCIAL_MEDIA',
+  WEBSITE_VISIT = 'WEBSITE_VISIT',
+  FORM_SUBMISSION = 'FORM_SUBMISSION',
+  OTHER = 'OTHER'
+}
+
+export enum CampaignType {
+  EMAIL = 'EMAIL',
+  SOCIAL_MEDIA = 'SOCIAL_MEDIA',
+  CONTENT_MARKETING = 'CONTENT_MARKETING',
+  PAID_ADVERTISING = 'PAID_ADVERTISING',
+  EVENT = 'EVENT',
+  REFERRAL = 'REFERRAL',
+  OTHER = 'OTHER'
+}
+
+export enum CampaignStatus {
+  DRAFT = 'DRAFT',
+  SCHEDULED = 'SCHEDULED',
+  ACTIVE = 'ACTIVE',
+  PAUSED = 'PAUSED',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED'
+}
+
+export enum TaskType {
+  CALL = 'CALL',
+  EMAIL = 'EMAIL',
+  MEETING = 'MEETING',
+  FOLLOW_UP = 'FOLLOW_UP',
+  RESEARCH = 'RESEARCH',
+  PROPOSAL = 'PROPOSAL',
+  PRESENTATION = 'PRESENTATION',
+  OTHER = 'OTHER'
+}
+
+export enum TaskPriority {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  URGENT = 'URGENT'
+}
+
+export enum TaskStatus {
+  PENDING = 'PENDING',
+  IN_PROGRESS = 'IN_PROGRESS',
+  COMPLETED = 'COMPLETED',
+  CANCELLED = 'CANCELLED',
+  DEFERRED = 'DEFERRED'
+}
+
+export enum WorkflowType {
+  LEAD_NURTURING = 'LEAD_NURTURING',
+  FOLLOW_UP = 'FOLLOW_UP',
+  TASK_ASSIGNMENT = 'TASK_ASSIGNMENT',
+  NOTIFICATION = 'NOTIFICATION',
+  DATA_ENRICHMENT = 'DATA_ENRICHMENT',
+  CUSTOM = 'CUSTOM'
+}
+
+export enum WorkflowExecutionStatus {
+  RUNNING = 'RUNNING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  CANCELLED = 'CANCELLED',
+  RETRYING = 'RETRYING'
+}
+
+// CRM Models
+
+export interface Lead {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  company?: string;
+  jobTitle?: string;
+  website?: string;
+  score: number;
+  status: LeadStatus;
+  source: string;
+  sourceDetails?: any;
+  industry?: string;
+  companySize?: string;
+  budget?: string;
+  timeline?: string;
+  lastContacted?: Date;
+  nextFollowUp?: Date;
+  nurtureStage?: string;
+  convertedAt?: Date;
+  convertedToContactId?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  assignedTo?: string;
+  assignedUser?: User;
+  convertedContact?: Contact;
+  interactions?: Interaction[];
+  tasks?: Task[];
+  campaigns?: CampaignLead[];
+}
+
+export interface Contact {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone?: string;
+  mobile?: string;
+  jobTitle?: string;
+  company?: string;
+  website?: string;
+  status: ContactStatus;
+  source?: string;
+  lastContactDate?: Date;
+  nextFollowUp?: Date;
+  leadValue?: number;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  assignedTo?: string;
+  assignedUser?: User;
+  convertedFromLead?: Lead;
+  interactions?: Interaction[];
+  deals?: Deal[];
+  tasks?: Task[];
+  campaigns?: CampaignContact[];
+}
+
+export interface Deal {
+  id: string;
+  name: string;
+  description?: string;
+  value: number;
+  currency: Currency;
+  stage: DealStage;
+  probability: number;
+  expectedCloseDate?: Date;
+  actualCloseDate?: Date;
+  lostReason?: string;
+  source?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  contactId: string;
+  contact?: Contact;
+  assignedTo?: string;
+  assignedUser?: User;
+  interactions?: Interaction[];
+  tasks?: Task[];
+}
+
+export interface Interaction {
+  id: string;
+  type: InteractionType;
+  subject?: string;
+  content?: string;
+  duration?: number; // in minutes
+  scheduledAt?: Date;
+  completedAt?: Date;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  leadId?: string;
+  lead?: Lead;
+  contactId?: string;
+  contact?: Contact;
+  dealId?: string;
+  deal?: Deal;
+  initiatedBy: string;
+  initiatedByUser?: User;
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  description?: string;
+  type: CampaignType;
+  status: CampaignStatus;
+  startDate: Date;
+  endDate?: Date;
+  budget?: number;
+  currency?: Currency;
+  targetAudience?: string;
+  goals?: any;
+  results?: any;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  createdBy: string;
+  createdByUser?: User;
+  leads?: CampaignLead[];
+  contacts?: CampaignContact[];
+  tasks?: Task[];
+}
+
+export interface CampaignLead {
+  id: string;
+  joinedAt: Date;
+  status?: string;
+  response?: string;
+  
+  // Relations
+  campaignId: string;
+  campaign?: Campaign;
+  leadId: string;
+  lead?: Lead;
+}
+
+export interface CampaignContact {
+  id: string;
+  joinedAt: Date;
+  status?: string;
+  response?: string;
+  
+  // Relations
+  campaignId: string;
+  campaign?: Campaign;
+  contactId: string;
+  contact?: Contact;
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  type: TaskType;
+  priority: TaskPriority;
+  status: TaskStatus;
+  dueDate?: Date;
+  completedAt?: Date;
+  estimatedHours?: number;
+  actualHours?: number;
+  notes?: string;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  assignedTo?: string;
+  assignedUser?: User;
+  leadId?: string;
+  lead?: Lead;
+  contactId?: string;
+  contact?: Contact;
+  dealId?: string;
+  deal?: Deal;
+  campaignId?: string;
+  campaign?: Campaign;
+}
+
+export interface Workflow {
+  id: string;
+  name: string;
+  description?: string;
+  type: WorkflowType;
+  trigger: any; // JSON trigger configuration
+  actions: any; // JSON actions configuration
+  conditions?: any; // JSON conditions
+  isActive: boolean;
+  lastRun?: Date;
+  nextRun?: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  createdBy: string;
+  createdByUser?: User;
+  executions?: WorkflowExecution[];
+}
+
+export interface WorkflowExecution {
+  id: string;
+  status: WorkflowExecutionStatus;
+  startedAt: Date;
+  completedAt?: Date;
+  result?: any; // JSON execution result
+  error?: string;
+  
+  // Relations
+  siteId: string;
+  site?: Site;
+  workflowId: string;
+  workflow?: Workflow;
 } 

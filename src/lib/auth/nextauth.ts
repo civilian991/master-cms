@@ -122,7 +122,14 @@ export const authOptions: NextAuthOptions = {
       },
       
             async authorize(credentials) {
+        console.log('🔐 NextAuth authorize called with:', { 
+          email: credentials?.email, 
+          siteId: credentials?.siteId,
+          hasPassword: !!credentials?.password 
+        });
+        
         if (!credentials?.email || !credentials?.password) {
+          console.log('❌ Missing email or password');
           return null
         }
 
@@ -174,9 +181,11 @@ export const authOptions: NextAuthOptions = {
           }
 
           // Verify password
+          console.log('🔍 Verifying password for user:', user.email);
           const isValidPassword = await bcrypt.compare(credentials.password, user.password)
           
           if (!isValidPassword) {
+            console.log('❌ Invalid password for user:', user.email);
             await logSecurityEvent({
               type: 'LOGIN_FAILURE',
               userId: user.id,
@@ -186,20 +195,24 @@ export const authOptions: NextAuthOptions = {
             return null
           }
 
+          console.log('✅ Password valid, logging in user:', user.email);
           await logSecurityEvent({
             type: 'LOGIN_SUCCESS',
             userId: user.id,
             siteId: siteId,
           })
 
-          return {
+          const userResult = {
             id: user.id,
             email: user.email,
             name: user.name,
             role: user.role,
             siteId: siteId,
             mfaEnabled: false, // Default to false since schema doesn't have this field
-          }
+          };
+          
+          console.log('✅ Returning user object:', userResult);
+          return userResult;
         } catch (error) {
           console.error('Authentication error:', error)
           return null
