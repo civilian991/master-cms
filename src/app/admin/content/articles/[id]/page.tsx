@@ -54,87 +54,12 @@ interface EditArticlePageProps {
   params: { id: string }
 }
 
-const mockCategories = [
-  { id: '1', name: 'Technology', nameAr: 'التكنولوجيا' },
-  { id: '2', name: 'Development', nameAr: 'التطوير' },
-  { id: '3', name: 'Design', nameAr: 'التصميم' },
-  { id: '4', name: 'Business', nameAr: 'الأعمال' }
-]
-
-const mockTags = [
-  { id: '1', name: 'React', nameAr: 'ريآكت' },
-  { id: '2', name: 'Next.js', nameAr: 'نكست.جي إس' },
-  { id: '3', name: 'TypeScript', nameAr: 'تايب سكريبت' },
-  { id: '4', name: 'Performance', nameAr: 'الأداء' },
-  { id: '5', name: 'UI/UX', nameAr: 'واجهة المستخدم' }
-]
-
-// Mock function to get article data
-async function getArticle(id: string): Promise<ArticleFormData | null> {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 500))
-  
-  // Mock data - replace with real API call
-  return {
-    id,
-    titleEn: 'Getting Started with Next.js 15',
-    titleAr: 'البدء مع Next.js 15',
-    contentEn: `Next.js 15 introduces several exciting new features that make building React applications even more powerful and efficient. In this comprehensive guide, we'll explore the key improvements and how to leverage them in your projects.
-
-## What's New in Next.js 15
-
-The latest version of Next.js brings significant improvements to performance, developer experience, and deployment capabilities. Here are the highlights:
-
-### 1. Enhanced App Router
-The App Router has been further refined with better performance and new features that make routing more intuitive.
-
-### 2. Improved Static Generation
-Static site generation has been optimized for better build times and smaller bundle sizes.
-
-### 3. Better Developer Experience
-Enhanced error messages, improved hot reloading, and better TypeScript support make development smoother.
-
-## Getting Started
-
-To get started with Next.js 15, you can create a new project using:
-
-\`\`\`bash
-npx create-next-app@latest my-app
-cd my-app
-npm run dev
-\`\`\`
-
-This will set up a new Next.js 15 project with all the latest features enabled by default.`,
-    contentAr: `يقدم Next.js 15 عدة ميزات جديدة مثيرة تجعل بناء تطبيقات React أكثر قوة وكفاءة. في هذا الدليل الشامل، سنستكشف التحسينات الرئيسية وكيفية الاستفادة منها في مشاريعك.
-
-## ما الجديد في Next.js 15
-
-يجلب الإصدار الأحدث من Next.js تحسينات كبيرة في الأداء وتجربة المطور وقدرات النشر. إليك النقاط البارزة:
-
-### 1. App Router المحسن
-تم تحسين App Router أكثر مع أداء أفضل وميزات جديدة تجعل التوجيه أكثر سهولة.
-
-### 2. Static Generation محسن
-تم تحسين إنشاء المواقع الثابتة لأوقات بناء أفضل وأحجام حزم أصغر.
-
-### 3. تجربة مطور أفضل
-رسائل خطأ محسنة، وإعادة تحميل ساخن محسن، ودعم أفضل لـ TypeScript يجعل التطوير أكثر سلاسة.`,
-    excerptEn: 'Learn the fundamentals of Next.js 15 and its new features that enhance React development.',
-    excerptAr: 'تعلم أساسيات Next.js 15 وميزاته الجديدة التي تعزز تطوير React.',
-    slug: 'getting-started-nextjs-15',
-    categoryId: '1',
-    tags: ['1', '2', '3'],
-    featured: true,
-    status: 'PUBLISHED',
-    publishedAt: '2024-01-15T10:00:00Z',
-    metaDescriptionEn: 'Complete guide to Next.js 15 features and improvements for React developers.',
-    metaDescriptionAr: 'دليل شامل لميزات وتحسينات Next.js 15 لمطوري React.',
-    featuredImage: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=400&fit=crop',
-    createdAt: '2024-01-10T08:00:00Z',
-    updatedAt: '2024-01-15T10:00:00Z',
-    authorId: 'user1',
-    views: 1245
-  }
+async function fetchArticle(id: string): Promise<ArticleFormData | null> {
+  const res = await fetch(`/api/content/articles/${id}`)
+  if (!res.ok) return null
+  const json = await res.json()
+  if (!json.success) return null
+  return json.data
 }
 
 export default function EditArticlePage({ params: { id } }: EditArticlePageProps) {
@@ -144,14 +69,28 @@ export default function EditArticlePage({ params: { id } }: EditArticlePageProps
   const [isSaving, setIsSaving] = useState(false)
   const [activeLanguage, setActiveLanguage] = useState<'en' | 'ar'>('en')
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  
+  const [categories, setCategories] = useState<Array<{ id: string; nameEn: string; nameAr?: string }>>([])
+  const [tags, setTags] = useState<Array<{ id: string; nameEn: string; nameAr?: string }>>([])
+
   const [formData, setFormData] = useState<ArticleFormData | null>(null)
 
   useEffect(() => {
     const loadArticle = async () => {
       try {
-        const article = await getArticle(id)
+        const [article, categoriesRes, tagsRes] = await Promise.all([
+          fetchArticle(id),
+          fetch('/api/categories?siteId=default'),
+          fetch('/api/tags?siteId=default')
+        ])
         setFormData(article)
+        if (categoriesRes.ok) {
+          const json = await categoriesRes.json()
+          if (json.success) setCategories(json.data)
+        }
+        if (tagsRes.ok) {
+          const json = await tagsRes.json()
+          if (json.success) setTags(json.data)
+        }
       } catch (error) {
         console.error('Error loading article:', error)
       } finally {
@@ -175,11 +114,12 @@ export default function EditArticlePage({ params: { id } }: EditArticlePageProps
         updatedAt: new Date().toISOString()
       }
 
-      // TODO: Replace with actual API call
-      console.log('Updating article:', payload)
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const res = await fetch(`/api/content/articles/${formData.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      if (!res.ok) throw new Error('Failed to update article')
 
       if (action === 'preview') {
         window.open(`/preview/articles/${formData.slug}`, '_blank')
@@ -197,11 +137,10 @@ export default function EditArticlePage({ params: { id } }: EditArticlePageProps
     if (!formData) return
     
     try {
-      // TODO: Replace with actual API call
-      console.log('Deleting article:', formData.id)
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      const res = await fetch(`/api/content/articles/${formData.id}`, {
+        method: 'DELETE'
+      })
+      if (!res.ok) throw new Error('Failed to delete article')
       
       router.push('/admin/content/articles')
     } catch (error) {
@@ -506,9 +445,9 @@ export default function EditArticlePage({ params: { id } }: EditArticlePageProps
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
               >
                 <option value="">Select Category</option>
-                {mockCategories.map(category => (
+                {categories.map(category => (
                   <option key={category.id} value={category.id}>
-                    {category.name} / {category.nameAr}
+                    {category.nameEn} {category.nameAr && `/ ${category.nameAr}`}
                   </option>
                 ))}
               </select>
@@ -525,7 +464,7 @@ export default function EditArticlePage({ params: { id } }: EditArticlePageProps
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {mockTags.map(tag => (
+                {tags.map(tag => (
                   <label key={tag.id} className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -533,7 +472,7 @@ export default function EditArticlePage({ params: { id } }: EditArticlePageProps
                       onChange={() => handleTagToggle(tag.id)}
                     />
                     <span className="text-sm">
-                      {tag.name} / {tag.nameAr}
+                      {tag.nameEn} {tag.nameAr && `/ ${tag.nameAr}`}
                     </span>
                   </label>
                 ))}
@@ -544,10 +483,10 @@ export default function EditArticlePage({ params: { id } }: EditArticlePageProps
                   <p className="text-sm font-medium mb-2">Selected Tags:</p>
                   <div className="flex flex-wrap gap-1">
                     {formData.tags.map(tagId => {
-                      const tag = mockTags.find(t => t.id === tagId)
+                      const tag = tags.find(t => t.id === tagId)
                       return tag ? (
                         <Badge key={tagId} variant="secondary" className="text-xs">
-                          {tag.name}
+                          {tag.nameEn}
                         </Badge>
                       ) : null
                     })}

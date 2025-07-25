@@ -45,26 +45,14 @@ interface ArticleFormData {
   featuredImage: string
 }
 
-const mockCategories = [
-  { id: '1', name: 'Technology', nameAr: 'التكنولوجيا' },
-  { id: '2', name: 'Development', nameAr: 'التطوير' },
-  { id: '3', name: 'Design', nameAr: 'التصميم' },
-  { id: '4', name: 'Business', nameAr: 'الأعمال' }
-]
-
-const mockTags = [
-  { id: '1', name: 'React', nameAr: 'ريآكت' },
-  { id: '2', name: 'Next.js', nameAr: 'نكست.جي إس' },
-  { id: '3', name: 'TypeScript', nameAr: 'تايب سكريبت' },
-  { id: '4', name: 'Performance', nameAr: 'الأداء' },
-  { id: '5', name: 'UI/UX', nameAr: 'واجهة المستخدم' }
-]
 
 export default function NewArticlePage() {
   const router = useRouter()
   const { data: session } = useSession()
   const [isLoading, setIsLoading] = useState(false)
   const [activeLanguage, setActiveLanguage] = useState<'en' | 'ar'>('en')
+  const [categories, setCategories] = useState<Array<{ id: string; nameEn: string; nameAr?: string }>>([])
+  const [tags, setTags] = useState<Array<{ id: string; nameEn: string; nameAr?: string }>>([])
   
   const [formData, setFormData] = useState<ArticleFormData>({
     titleEn: '',
@@ -107,7 +95,6 @@ export default function NewArticlePage() {
         }
       } catch (error) {
         console.error('Error loading categories/tags:', error)
-        // Keep mock data as fallback
       }
     }
 
@@ -429,9 +416,9 @@ export default function NewArticlePage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md"
               >
                 <option value="">Select Category</option>
-                {mockCategories.map(category => (
+                {categories.map(category => (
                   <option key={category.id} value={category.id}>
-                    {category.name} / {category.nameAr}
+                    {category.nameEn} {category.nameAr && `/ ${category.nameAr}`}
                   </option>
                 ))}
               </select>
@@ -448,7 +435,7 @@ export default function NewArticlePage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {mockTags.map(tag => (
+                {tags.map(tag => (
                   <label key={tag.id} className="flex items-center space-x-2 cursor-pointer">
                     <input
                       type="checkbox"
@@ -456,7 +443,7 @@ export default function NewArticlePage() {
                       onChange={() => handleTagToggle(tag.id)}
                     />
                     <span className="text-sm">
-                      {tag.name} / {tag.nameAr}
+                      {tag.nameEn} {tag.nameAr && `/ ${tag.nameAr}`}
                     </span>
                   </label>
                 ))}
@@ -467,10 +454,10 @@ export default function NewArticlePage() {
                   <p className="text-sm font-medium mb-2">Selected Tags:</p>
                   <div className="flex flex-wrap gap-1">
                     {formData.tags.map(tagId => {
-                      const tag = mockTags.find(t => t.id === tagId)
+                      const tag = tags.find(t => t.id === tagId)
                       return tag ? (
                         <Badge key={tagId} variant="secondary" className="text-xs">
-                          {tag.name}
+                          {tag.nameEn}
                         </Badge>
                       ) : null
                     })}
