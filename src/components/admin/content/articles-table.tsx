@@ -19,7 +19,6 @@ import {
 } from "lucide-react"
 
 import { AdminTable, AdminTableColumn } from "@/components/admin/core/admin-table"
-import { AdminModal, AdminModalForm } from "@/components/admin/core/admin-modal"
 import { AdminForm, AdminFormSection } from "@/components/admin/core/admin-form"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -27,6 +26,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/hooks/use-toast"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { z } from "zod"
 
 // TypeScript interfaces for Article data
@@ -202,9 +203,7 @@ export function ArticlesTable() {
   const [totalCount, setTotalCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [selectedArticles, setSelectedArticles] = useState<Article[]>([])
-  const [createModalOpen, setCreateModalOpen] = useState(false)
-  const [editModalOpen, setEditModalOpen] = useState(false)
-  const [editingArticle, setEditingArticle] = useState<Article | null>(null)
+  const router = useRouter()
   const [currentPage, setCurrentPage] = useState(1)
   const [searchQuery, setSearchQuery] = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -495,8 +494,7 @@ export function ArticlesTable() {
         window.open(`/articles/${article.slug}`, '_blank')
         break
       case "edit":
-        setEditingArticle(article)
-        setEditModalOpen(true)
+        router.push(`/admin/articles/${article.id}/edit`)
         break
       case "analytics":
         // Navigate to analytics
@@ -545,54 +543,6 @@ export function ArticlesTable() {
       })
     }
   }
-
-  const handleCreateArticle = async (data: z.infer<typeof articleSchema>) => {
-    setLoading(true)
-    try {
-      await articlesApi.createArticle(data)
-      toast({
-        title: "Success",
-        description: "Article created successfully"
-      })
-      setCreateModalOpen(false)
-      loadArticles()
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create article'
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleUpdateArticle = async (data: z.infer<typeof articleSchema>) => {
-    if (!editingArticle) return
-    
-    setLoading(true)
-    try {
-      await articlesApi.updateArticle(editingArticle.id, data)
-      toast({
-        title: "Success",
-        description: "Article updated successfully"
-      })
-      setEditModalOpen(false)
-      setEditingArticle(null)
-      loadArticles()
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to update article'
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive"
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const handleExport = (format: 'csv' | 'pdf') => {
     // TODO: Implement export functionality with real API
     console.log(`Exporting articles as ${format}`)
@@ -624,10 +574,12 @@ export function ArticlesTable() {
             Manage your content with multilingual support and advanced workflow
           </p>
         </div>
-        <Button onClick={() => setCreateModalOpen(true)}>
-          <PlusIcon className="h-4 w-4 mr-2" />
-          New Article
-        </Button>
+        <Link href="/admin/articles/new">
+          <Button>
+            <PlusIcon className="h-4 w-4 mr-2" />
+            New Article
+          </Button>
+        </Link>
       </div>
 
       {/* Error State */}
@@ -673,55 +625,6 @@ export function ArticlesTable() {
         emptyStateTitle="No articles found"
         emptyStateDescription="Get started by creating your first article."
       />
-
-      {/* Create Article Modal */}
-      <AdminModalForm
-        open={createModalOpen}
-        onOpenChange={setCreateModalOpen}
-        title="Create New Article"
-        description="Add a new article with multilingual support"
-        size="xl"
-        loading={loading}
-        submitLabel="Create Article"
-      >
-        <AdminForm
-          title=""
-          sections={formSections}
-          schema={articleSchema}
-          onSubmit={handleCreateArticle}
-        />
-      </AdminModalForm>
-
-      {/* Edit Article Modal */}
-      <AdminModalForm
-        open={editModalOpen}
-        onOpenChange={setEditModalOpen}
-        title="Edit Article"
-        description="Update article content and metadata"
-        size="xl"
-        loading={loading}
-        submitLabel="Save Changes"
-      >
-        {editingArticle && (
-          <AdminForm
-            title=""
-            sections={formSections}
-            schema={articleSchema}
-            defaultValues={{
-              titleEn: editingArticle.titleEn,
-              titleAr: editingArticle.titleAr,
-              excerptEn: editingArticle.excerptEn,
-              excerptAr: editingArticle.excerptAr,
-              contentEn: editingArticle.contentEn,
-              contentAr: editingArticle.contentAr,
-              categoryId: editingArticle.category?.id,
-              tags: editingArticle.tags.map(tag => tag.nameEn),
-              status: editingArticle.status,
-            }}
-            onSubmit={handleUpdateArticle}
-          />
-        )}
-      </AdminModalForm>
     </div>
   )
-} 
+}
